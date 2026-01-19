@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { fetchPostBySlug, fetchRelatedPosts } from '../services/supabaseService';
 import { subscribeNewsletter } from '../services/emailService';
 import { BlogPost as BlogPostType } from '../types';
-import { ArrowLeft, Calendar, Clock, User, Linkedin, Twitter, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, Linkedin, Twitter, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle, X } from 'lucide-react';
 import ScrollAnimation from '../components/ScrollAnimation';
+import MultiStepForm from '../components/MultiStepForm';
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -12,9 +13,13 @@ const BlogPost: React.FC = () => {
     const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Estado do Modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     // Estado da Newsletter Sidebar
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [copySuccess, setCopySuccess] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -35,9 +40,15 @@ const BlogPost: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
+    useEffect(() => {
+        if (isModalOpen) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = 'auto';
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [isModalOpen]);
+
     const handleShare = (platform: string) => {
-        const url = window.location.href;
-        const text = `Confira este artigo incrível: ${post?.title}`;
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(post?.title || '');
         let shareUrl = '';
 
         switch (platform) {
@@ -45,17 +56,18 @@ const BlogPost: React.FC = () => {
                 shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
                 break;
             case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+                shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
                 break;
             case 'linkedin':
-                shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${post?.title}`;
+                shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`;
                 break;
             case 'whatsapp':
-                 shareUrl = `https://api.whatsapp.com/send?text=${text} ${url}`;
+                 shareUrl = `https://api.whatsapp.com/send?text=${title}%20${url}`;
                  break;
             case 'copy':
-                navigator.clipboard.writeText(url);
-                alert('Link copiado para a área de transferência!');
+                navigator.clipboard.writeText(window.location.href);
+                setCopySuccess(true);
+                setTimeout(() => setCopySuccess(false), 2000);
                 return;
         }
 
@@ -189,7 +201,8 @@ const BlogPost: React.FC = () => {
                                             WhatsApp
                                         </button>
                                         <button onClick={() => handleShare('copy')} className="flex items-center gap-3 px-6 py-4 bg-white/5 text-gray-400 border border-white/10 rounded-2xl hover:bg-white/20 hover:text-white transition-all font-bold text-sm ml-auto">
-                                            <LinkIcon size={20} /> Copiar Link
+                                            {copySuccess ? <CheckCircle size={20} className="text-green-500"/> : <LinkIcon size={20} />}
+                                            {copySuccess ? 'Copiado!' : 'Copiar Link'}
                                         </button>
                                     </div>
                                 </div>
@@ -210,9 +223,12 @@ const BlogPost: React.FC = () => {
                                 <p className="text-gray-400 text-base mb-8 leading-relaxed">
                                     Transforme sua ideia em realidade digital. Desenvolvimento high-end focado em performance e conversão.
                                 </p>
-                                <a href="#contact" className="block w-full text-center py-4 bg-white text-black font-bold rounded-xl hover:bg-neon-cyan transition-colors shadow-lg shadow-neon-cyan/10">
+                                <button 
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="block w-full text-center py-4 bg-white text-black font-bold rounded-xl hover:bg-neon-cyan transition-colors shadow-lg shadow-neon-cyan/10"
+                                >
                                     Solicitar Orçamento
-                                </a>
+                                </button>
                             </div>
                         </ScrollAnimation>
 
@@ -283,6 +299,41 @@ const BlogPost: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL DE ORÇAMENTO */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 animate-fade-in">
+                    <div className="relative w-full max-w-4xl bg-bg-dark rounded-3xl shadow-2xl overflow-hidden border border-white/10 animate-scale-up">
+                        <button 
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-red-500/20 text-white hover:text-red-500 rounded-full transition-colors border border-white/10"
+                        >
+                            <X size={24} />
+                        </button>
+                        
+                        <div className="grid lg:grid-cols-2">
+                             <div className="hidden lg:flex flex-col justify-center p-12 bg-white/[0.02] relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-neon-purple/10 to-transparent"></div>
+                                <div className="relative z-10">
+                                    <h2 className="text-4xl font-bold mb-6">Vamos escalar seu negócio?</h2>
+                                    <p className="text-gray-400 mb-8 leading-relaxed">
+                                        Nossa equipe está pronta para entender seus desafios e propor uma solução digital sob medida.
+                                    </p>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Análise de Requisitos</li>
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Proposta Técnica Detalhada</li>
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Cronograma de Execução</li>
+                                    </ul>
+                                </div>
+                             </div>
+                             
+                             <div className="p-1">
+                                <MultiStepForm />
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

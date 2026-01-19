@@ -204,7 +204,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-500 text-center md:text-left">
-          <p>&copy; 2025 UX Vision. Todos os direitos reservados.</p>
+          <p>&copy; 2025 <strong>UX Vision.</strong> Todos os direitos reservados.</p>
           <div className="flex flex-wrap justify-center gap-6">
             <Link to="/terms" className="hover:text-white transition-colors py-2">Termos de Uso</Link>
             <Link to="/privacy" className="hover:text-white transition-colors py-2">Política de Privacidade</Link>
