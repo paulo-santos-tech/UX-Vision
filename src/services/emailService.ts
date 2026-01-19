@@ -1,8 +1,9 @@
+
 // ==============================================================================
-// SERVIÇO DE EMAIL SIMPLIFICADO (Via FormSubmit.co)
+// SERVIÇO DE EMAIL + BACKUP DE DADOS
 // ==============================================================================
-// Não requer instalação de libs, nem cadastro prévio.
-// Apenas ative clicando no link que chegará no primeiro email de teste.
+
+import { createLead } from './supabaseService';
 
 interface EmailData {
     name: string;
@@ -18,6 +19,17 @@ const ENDPOINT = `https://formsubmit.co/ajax/${PRIMARY_EMAIL}`;
 
 export const sendProjectRequest = async (formData: EmailData) => {
     try {
+        // 1. BACKUP NO SUPABASE (Segurança de Dados)
+        // Tentamos salvar no banco primeiro. Se falhar, o email ainda tenta ser enviado.
+        await createLead({
+            name: formData.name,
+            email: formData.email,
+            whatsapp: formData.whatsapp,
+            project_type: formData.type,
+            details: formData.details
+        });
+
+        // 2. ENVIO DO EMAIL ESTILIZADO (FormSubmit)
         const response = await fetch(ENDPOINT, {
             method: "POST",
             headers: { 
@@ -25,18 +37,28 @@ export const sendProjectRequest = async (formData: EmailData) => {
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                // Dados do Formulário
-                "Nome do Cliente": formData.name,
-                "Email de Contato": formData.email,
-                "WhatsApp": formData.whatsapp,
-                "Tipo de Projeto": formData.type || "Não informado",
-                "Detalhes": formData.details || "Sem detalhes",
+                // -- DADOS VISUAIS (Estrutura de "Recibo") --
                 
-                // Configurações do FormSubmit
-                "_subject": `🚀 Novo Lead: ${formData.name}`, // Assunto do email
-                "_cc": SECONDARY_EMAIL, // Envia cópia para o marketing
-                "_template": "box", // Layout bonito automático
-                "_captcha": "false" // Desativa captcha chato (opcional)
+                // O FormSubmit exibe as chaves em ordem. Usamos emojis para UX.
+                "📅 Data do Pedido": new Date().toLocaleDateString('pt-BR'),
+                "⏰ Horário": new Date().toLocaleTimeString('pt-BR'),
+                "--------------------------------": "--------------------------------",
+
+                "👤 Nome do Cliente": formData.name,
+                "✉️ E-mail Profissional": formData.email,
+                "📱 WhatsApp": formData.whatsapp,
+                "🚀 Tipo de Projeto": formData.type || "Consultoria Geral",
+                
+                "📝 Detalhes da Solicitação": formData.details || "Nenhum detalhe adicional fornecido.",
+                
+                "---------------------------------": "---------------------------------",
+                "🔗 Origem do Lead": "Site Oficial UX Vision",
+
+                // -- CONFIGURAÇÕES TÉCNICAS (Hidden Fields) --
+                "_subject": `🔥 Novo Lead: ${formData.name} [${formData.type}]`, 
+                "_cc": SECONDARY_EMAIL, 
+                "_template": "table", // 'table' é mais limpo/profissional que o 'box' cinza
+                "_captcha": "false" 
             })
         });
 
@@ -46,7 +68,7 @@ export const sendProjectRequest = async (formData: EmailData) => {
             return { success: true };
         } else {
             console.error("Erro FormSubmit:", result);
-            return { success: false, error: "Falha no envio" };
+            return { success: false, error: "Falha no envio do e-mail" };
         }
 
     } catch (error) {
@@ -56,10 +78,19 @@ export const sendProjectRequest = async (formData: EmailData) => {
 };
 
 // ==============================================================================
-// FUNÇÃO DE NEWSLETTER (NOVO)
+// NEWSLETTER
 // ==============================================================================
 export const subscribeNewsletter = async (email: string) => {
     try {
+        // Salva lead simplificado no banco
+        await createLead({
+            name: 'Newsletter Subscriber',
+            email: email,
+            whatsapp: '',
+            project_type: 'Newsletter',
+            details: 'Inscrição via rodapé/blog'
+        });
+
         const response = await fetch(ENDPOINT, {
             method: "POST",
             headers: { 
@@ -67,11 +98,11 @@ export const subscribeNewsletter = async (email: string) => {
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                "Nova Inscrição": "Newsletter",
-                "Email do Assinante": email,
+                "✨ Nova Inscrição VIP": email,
+                "📅 Data": new Date().toLocaleString('pt-BR'),
                 
                 // Configurações
-                "_subject": `📧 Nova Inscrição na Newsletter: ${email}`,
+                "_subject": `📧 Newsletter: ${email}`,
                 "_cc": SECONDARY_EMAIL,
                 "_template": "table",
                 "_captcha": "false"

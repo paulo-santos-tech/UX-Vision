@@ -1,13 +1,27 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Project, BlogPost, MicroSaas } from '../types';
+
+// ==============================================================================
+// 1. CONFIGURAÇÃO E CONEXÃO
+// ==============================================================================
 
 const FALLBACK_URL = "https://gbnfoigyzcoccfdbgzmk.supabase.co";
 const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmZvaWd5emNvY2NmZGJnem1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MDQ2MDksImV4cCI6MjA4NDA4MDYwOX0.6Qtm1ktpZvtHOrvz2WReBzibFVchD6AfYOOTbdS4umk";
 
 const getEnv = (key: string, fallback: string): string => {
     try {
+        // @ts-ignore
         if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+            // @ts-ignore
             return import.meta.env[key];
+        }
+    } catch (e) {}
+    try {
+        // @ts-ignore
+        if (typeof process !== 'undefined' && process.env && process.env[key]) {
+            // @ts-ignore
+            return process.env[key];
         }
     } catch (e) {}
     return fallback;
@@ -19,8 +33,31 @@ const supabaseKey = getEnv('VITE_SUPABASE_ANON_KEY', FALLBACK_KEY);
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ==============================================================================
-// 1. PROJETOS (LEITURA)
+// 2. AUTENTICAÇÃO
 // ==============================================================================
+
+export const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+    return { data, error };
+};
+
+export const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    return { error };
+};
+
+export const getCurrentUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user || null;
+};
+
+// ==============================================================================
+// 3. FUNÇÕES DO PORTFÓLIO
+// ==============================================================================
+
 export const fetchProjects = async (): Promise<Project[]> => {
     try {
         const { data, error } = await supabase
@@ -87,8 +124,9 @@ export const fetchProjectById = async (id: string): Promise<Project | undefined>
 };
 
 // ==============================================================================
-// 2. BLOG (LEITURA)
+// 4. FUNÇÕES DO BLOG
 // ==============================================================================
+
 export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
     try {
         const { data, error } = await supabase
@@ -178,8 +216,9 @@ export const fetchRelatedPosts = async (currentSlug: string, category: string): 
 };
 
 // ==============================================================================
-// 3. MICROSAAS (LEITURA)
+// 5. FUNÇÕES DE MICROSAAS
 // ==============================================================================
+
 export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
     try {
         const { data, error } = await supabase
@@ -204,5 +243,38 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
     } catch (err) {
         console.error(err);
         return [];
+    }
+};
+
+// ==============================================================================
+// 6. FUNÇÕES DE LEADS (NOVO)
+// ==============================================================================
+
+export const createLead = async (leadData: { 
+    name: string; 
+    email: string; 
+    whatsapp: string; 
+    project_type?: string; 
+    details?: string; 
+}) => {
+    try {
+        const { error } = await supabase
+            .from('leads')
+            .insert([{
+                name: leadData.name,
+                email: leadData.email,
+                whatsapp: leadData.whatsapp,
+                project_type: leadData.project_type,
+                details: leadData.details
+            }]);
+
+        if (error) {
+            console.error('Erro ao salvar lead no Supabase:', error);
+            return { success: false, error };
+        }
+        return { success: true };
+    } catch (err) {
+        console.error('Erro inesperado lead:', err);
+        return { success: false, error: err };
     }
 };

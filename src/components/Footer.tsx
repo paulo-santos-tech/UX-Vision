@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Rocket, Instagram, Linkedin, Github, Mail, MapPin, Smartphone, CheckCircle, Loader2 } from 'lucide-react';
+import { Rocket, Instagram, Linkedin, Github, Mail, MapPin, CheckCircle, Loader2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
 
 // ✅ IMPORT DO LOGO (VITE)
 import logo from '../logo.svg';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const FOOTER_NAV_LINKS = [
   { name: 'Quem Somos', href: 'about', type: 'anchor' },
@@ -149,7 +150,7 @@ const Footer: React.FC = () => {
 
               <li className="flex items-center gap-4">
                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
-                  <Smartphone className="w-5 h-5 text-neon-purple" />
+                  <FaWhatsapp className="w-5 h-5 text-neon-purple" />
                 </div>
                 <span>(14) 99820-3321</span>
               </li>
