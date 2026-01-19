@@ -4,7 +4,7 @@ import { Menu, X, ChevronRight, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ✅ IMPORT DO LOGO (VITE)
-import logo from '../assets/logo.svg';
+import logo from '../logo.svg';
 
 const NAV_LINKS = [
   { name: 'Quem Somos', href: 'about', type: 'anchor' },

@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
 
 // ✅ IMPORT DO LOGO (VITE)
-import logo from '../assets/logo.svg';
+import logo from '../logo.svg';
 
 const FOOTER_NAV_LINKS = [
   { name: 'Quem Somos', href: 'about', type: 'anchor' },
