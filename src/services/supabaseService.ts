@@ -1,0 +1,208 @@
+import { createClient } from '@supabase/supabase-js';
+import { Project, BlogPost, MicroSaas } from '../types';
+
+const FALLBACK_URL = "https://gbnfoigyzcoccfdbgzmk.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmZvaWd5emNvY2NmZGJnem1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MDQ2MDksImV4cCI6MjA4NDA4MDYwOX0.6Qtm1ktpZvtHOrvz2WReBzibFVchD6AfYOOTbdS4umk";
+
+const getEnv = (key: string, fallback: string): string => {
+    try {
+        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+            return import.meta.env[key];
+        }
+    } catch (e) {}
+    return fallback;
+};
+
+const supabaseUrl = getEnv('VITE_SUPABASE_URL', FALLBACK_URL);
+const supabaseKey = getEnv('VITE_SUPABASE_ANON_KEY', FALLBACK_KEY);
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
+
+// ==============================================================================
+// 1. PROJETOS (LEITURA)
+// ==============================================================================
+export const fetchProjects = async (): Promise<Project[]> => {
+    try {
+        const { data, error } = await supabase
+            .from('portfolio')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Erro ao buscar projetos:', error.message);
+            return [];
+        }
+
+        return data.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            description: item.description, 
+            fullDescription: item.full_description,
+            challenge: item.challenge,
+            solution: item.solution,
+            image_url: item.image,
+            gallery: item.gallery || [],
+            technologies: item.technologies || [],
+            client: item.client,
+            year: item.year,
+            link: item.link
+        }));
+
+    } catch (err) {
+        console.error('Erro inesperado em fetchProjects:', err);
+        return [];
+    }
+};
+
+export const fetchProjectById = async (id: string): Promise<Project | undefined> => {
+    try {
+        const { data, error } = await supabase
+            .from('portfolio')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error || !data) return undefined;
+
+        return {
+            id: data.id,
+            title: data.title,
+            category: data.category,
+            description: data.description,
+            fullDescription: data.full_description,
+            challenge: data.challenge,
+            solution: data.solution,
+            image_url: data.image,
+            gallery: data.gallery || [],
+            technologies: data.technologies || [],
+            client: data.client,
+            year: data.year,
+            link: data.link
+        };
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
+};
+
+// ==============================================================================
+// 2. BLOG (LEITURA)
+// ==============================================================================
+export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
+    try {
+        const { data, error } = await supabase
+            .from('blog_posts')
+            .select('*')
+            .eq('status', 'published') 
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Erro blog:', error);
+            return [];
+        }
+
+        return data.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            slug: post.slug,
+            excerpt: post.excerpt,
+            category: post.category,
+            image_url: post.image, 
+            content: post.content,
+            author: post.author,
+            readTime: post.read_time, 
+            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+        }));
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
+
+export const fetchPostBySlug = async (slug: string): Promise<BlogPost | undefined> => {
+    try {
+        const { data, error } = await supabase
+            .from('blog_posts')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+        if (error || !data) return undefined;
+
+        return {
+            id: data.id,
+            title: data.title,
+            slug: data.slug,
+            excerpt: data.excerpt,
+            category: data.category,
+            image_url: data.image,
+            content: data.content,
+            author: data.author,
+            readTime: data.read_time,
+            date: new Date(data.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+        };
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
+};
+
+export const fetchRelatedPosts = async (currentSlug: string, category: string): Promise<BlogPost[]> => {
+    try {
+        const { data } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('category', category)
+        .neq('slug', currentSlug)
+        .eq('status', 'published')
+        .limit(3);
+
+        if (!data) return [];
+
+        return data.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            slug: post.slug,
+            excerpt: post.excerpt,
+            category: post.category,
+            image_url: post.image,
+            author: post.author,
+            readTime: post.read_time,
+            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+        }));
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
+
+// ==============================================================================
+// 3. MICROSAAS (LEITURA)
+// ==============================================================================
+export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
+    try {
+        const { data, error } = await supabase
+            .from('microsaas')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Erro microsaas:', error);
+            return [];
+        }
+
+        return data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            status: item.status,
+            price: item.price,
+            link: item.link,
+            features: item.features || [] 
+        }));
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
