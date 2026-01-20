@@ -102,7 +102,6 @@ const Header: React.FC = () => {
                         alt="UX Vision Logo" 
                         className="h-10 md:h-12 w-auto object-contain" 
                     />
-                    <span className="tracking-tight text-white font-bold text-xl md:text-2xl group-hover:text-neon-purple transition-colors">UX Vision</span>
                 </Link>
 
                 <nav className="hidden lg:flex items-center gap-8">
