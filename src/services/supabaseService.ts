@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Project, BlogPost, MicroSaas } from '../types';
 
@@ -235,6 +234,7 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
             id: item.id,
             name: item.name,
             description: item.description,
+            image: item.image, // Mapeando a coluna 'image' do banco
             status: item.status,
             price: item.price,
             link: item.link,
@@ -247,7 +247,7 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
 };
 
 // ==============================================================================
-// 6. FUNÇÕES DE LEADS (NOVO)
+// 6. FUNÇÕES DE LEADS
 // ==============================================================================
 
 export const createLead = async (leadData: { 

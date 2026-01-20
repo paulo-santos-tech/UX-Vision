@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchMicrosaas } from '../services/supabaseService';
 import { MicroSaas } from '../types';
 import ScrollAnimation from '../components/ScrollAnimation';
-import { CheckCircle, Rocket } from 'lucide-react';
+import { CheckCircle, Rocket, Layers } from 'lucide-react';
 
 const Microsaas: React.FC = () => {
     const [products, setProducts] = useState<MicroSaas[]>([]);
@@ -31,28 +31,41 @@ const Microsaas: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {products.map((item, idx) => (
                         <ScrollAnimation key={item.id} delay={idx * 0.1}>
-                            <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-2xl p-8 hover:border-neon-cyan/50 transition-all group relative overflow-hidden">
+                            <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-2xl p-8 hover:border-neon-cyan/50 transition-all group relative overflow-hidden flex flex-col h-full">
                                 
                                 <div className={`absolute top-0 right-0 px-4 py-1 text-xs font-bold uppercase rounded-bl-xl
                                     ${item.status === 'Venda' ? 'bg-neon-purple text-white' : 'bg-neon-cyan text-black'}`}>
                                     {item.status}
                                 </div>
 
-                                <h3 className="text-2xl font-bold mb-2">{item.name}</h3>
-                                <p className="text-gray-400 mb-6 h-12">{item.description}</p>
+                                {/* LOGO / ÍCONE DO PRODUTO */}
+                                <div className="mb-6">
+                                    {item.image ? (
+                                        <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-neon-cyan">
+                                            <Layers size={32} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <h3 className="text-2xl font-bold mb-3">{item.name}</h3>
+                                <p className="text-gray-400 mb-6 flex-grow">{item.description}</p>
                                 
-                                <div className="space-y-3 mb-8">
+                                <div className="space-y-3 mb-8 bg-black/20 p-4 rounded-xl border border-white/5">
                                     {item.features.map((feat, i) => (
-                                        <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                                            <CheckCircle size={16} className="text-neon-purple" />
-                                            {feat}
+                                        <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                                            <CheckCircle size={16} className="text-neon-purple mt-0.5 shrink-0" />
+                                            <span>{feat}</span>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
                                     <span className="text-xl font-bold text-white">{item.price ? item.price : 'Grátis / Beta'}</span>
-                                    <a href={item.link} className="bg-white/10 hover:bg-neon-cyan hover:text-black text-white px-4 py-2 rounded-lg transition-all font-semibold">
+                                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-neon-cyan hover:text-black text-white px-6 py-2 rounded-lg transition-all font-semibold text-sm">
                                         Acessar
                                     </a>
                                 </div>

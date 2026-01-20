@@ -32,6 +32,7 @@ export interface MicroSaas {
     id: number;
     name: string;
     description: string;
+    image?: string; // Novo campo para o ícone/logo
     status: 'Venda' | 'Uso' | 'Beta';
     price?: string;
     link: string;
