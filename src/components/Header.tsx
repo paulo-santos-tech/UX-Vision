@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronRight, User, ExternalLink } from 'lucide-react';
+import { Menu, X, ChevronRight, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logo from '../logo.svg'; // Importação correta do logo na pasta src
+import logo from '../logo.svg';
 
 // ==================================================================================
 // CONFIGURAÇÃO DOS LINKS
@@ -40,16 +40,13 @@ const Header: React.FC = () => {
         return () => { document.body.style.overflow = 'auto'; };
     }, [isOpen]);
 
-    // Função específica para o clique no Logo
     const handleLogoClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setIsOpen(false);
         
         if (location.pathname === '/') {
-            // Se já está na home, sobe suavemente
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            // Se está em outra página, vai para home e reseta o scroll
             navigate('/');
             window.scrollTo(0, 0);
         }
@@ -94,18 +91,18 @@ const Header: React.FC = () => {
         <header className={`fixed top-0 w-full z-50 transition-all duration-300 h-[90px] md:h-[100px] flex items-center ${headerBgClass}`}>
             <div className="max-w-[1400px] w-full mx-auto px-6 flex justify-between items-center relative z-50">
                 
-                {/* LOGO COM COMPORTAMENTO DE SCROLL TO TOP */}
+                {/* LOGO */}
                 <Link 
                     to="/" 
                     className="flex items-center gap-3 group relative z-50 hover:opacity-80 transition-opacity" 
                     onClick={handleLogoClick}
                 >
-                    {/* Usando a variável importada 'logo' */}
                     <img 
                         src={logo} 
                         alt="UX Vision Logo" 
                         className="h-10 md:h-12 w-auto object-contain" 
                     />
+                    <span className="tracking-tight text-white font-bold text-xl md:text-2xl group-hover:text-neon-purple transition-colors">UX Vision</span>
                 </Link>
 
                 <nav className="hidden lg:flex items-center gap-8">
@@ -121,13 +118,13 @@ const Header: React.FC = () => {
                         </a>
                     ))}
                     
-                    {/* LINK EXTERNO PARA O CMS */}
+                    {/* LINK DIRETO PARA O CMS EXTERNO */}
                     <a 
                         href="https://cms.uxvision.com.br/" 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="ml-4 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all border border-transparent hover:border-white/10"
-                        title="Acesso CMS Externo"
+                        title="Acesso CMS"
                     >
                         <User size={20} />
                     </a>
@@ -186,8 +183,8 @@ const Header: React.FC = () => {
                                     onClick={() => setIsOpen(false)}
                                     className="flex items-center justify-between p-4 border-b border-white/5 text-xl font-bold text-gray-400 hover:text-white transition-all duration-300 group"
                                 >
-                                    Acesso CMS Externo
-                                    <ExternalLink size={20} />
+                                    Acesso CMS
+                                    <User size={20} />
                                 </a>
                             </motion.div>
 

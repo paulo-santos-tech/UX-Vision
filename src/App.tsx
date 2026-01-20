@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { createClient } from '@supabase/supabase-js';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -13,6 +14,38 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ThankYou from './pages/ThankYou';
 import NotFound from './pages/NotFound';
 
+// ==============================================================================
+// CONFIGURAÇÃO DO ANALYTICS (Cliente Específico)
+// ==============================================================================
+const analyticsSupabase = createClient(
+  'https://gbnfoigyzcoccfdbgzmk.supabase.co', 
+  'sb_publishable_ZfZzn4PP-ajJ6S5c9JVrAg_4Tvvc8i4'
+);
+
+// Componente invisível que monitora a navegação
+const AnalyticsTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const trackView = async () => {
+      try {
+        await analyticsSupabase.from('page_analytics').insert([{
+          path: location.pathname + location.search, // Captura rota completa (/blog, /project/1, etc)
+          referrer: document.referrer,
+          user_agent: navigator.userAgent
+        }]);
+      } catch (e) { 
+        console.error('Analytics Error', e); 
+      }
+    };
+
+    trackView();
+  }, [location]); // Executa toda vez que a URL muda
+
+  return null;
+};
+
+// Componente para rolar para o topo ou âncoras ao navegar
 const ScrollToAnchor = () => {
   const { pathname, hash } = useLocation();
 
@@ -36,7 +69,10 @@ const ScrollToAnchor = () => {
 const App: React.FC = () => {
   return (
     <Router>
+      {/* Utilitários de Navegação e Rastreamento */}
       <ScrollToAnchor />
+      <AnalyticsTracker />
+
       <div className="min-h-screen flex flex-col bg-bg-dark text-white font-sans selection:bg-neon-purple selection:text-white">
         <Header />
         <main className="flex-grow">
@@ -50,6 +86,8 @@ const App: React.FC = () => {
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/thank-you" element={<ThankYou />} />
+            
+            {/* Páginas de Login e Admin removidas conforme solicitado */}
             
             <Route path="*" element={<NotFound />} />
           </Routes>
