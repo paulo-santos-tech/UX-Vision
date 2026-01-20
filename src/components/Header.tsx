@@ -16,9 +16,6 @@ const NAV_LINKS = [
     { name: 'Blog', href: 'blog', type: 'anchor' },              
 ];
 
-// 🔴 COLOQUE O LINK DO SEU CMS AQUI
-const EXTERNAL_CMS_URL = "https://seu-cms-externo.com/login"; 
-
 const Header: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -109,6 +106,7 @@ const Header: React.FC = () => {
                         alt="UX Vision Logo" 
                         className="h-10 md:h-12 w-auto object-contain" 
                     />
+                    <span className="tracking-tight text-white font-bold text-xl md:text-2xl group-hover:text-neon-purple transition-colors">UX Vision</span>
                 </Link>
 
                 <nav className="hidden lg:flex items-center gap-8">
