@@ -328,7 +328,7 @@ const BlogPost: React.FC = () => {
                              </div>
                              
                              <div className="p-1">
-                                <MultiStepForm />
+                                <MultiStepForm embedded={true} />
                              </div>
                         </div>
                     </div>

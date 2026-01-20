@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { sendProjectRequest } from '../services/emailService';
 import { ChevronLeft, ChevronRight, CheckCircle, Rocket, AlertCircle } from 'lucide-react';
 
-const MultiStepForm: React.FC = () => {
+interface MultiStepFormProps {
+    embedded?: boolean; // Se true, mostra sucesso na tela e não redireciona
+}
+
+const MultiStepForm: React.FC<MultiStepFormProps> = ({ embedded = false }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', type: '', details: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false); // Novo estado para sucesso local
     const navigate = useNavigate();
 
     const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
@@ -33,19 +38,44 @@ const MultiStepForm: React.FC = () => {
         
         setLoading(false);
         if (result.success) {
-            navigate('/thank-you');
+            if (embedded) {
+                // Se estiver no modo embedded (ex: modal do blog), mostra sucesso local
+                setIsSuccess(true);
+            } else {
+                // Se estiver na Home, redireciona
+                navigate('/thank-you');
+            }
         } else {
             setError('Erro ao enviar. Verifique sua conexão ou tente novamente mais tarde.');
         }
     };
 
+    // Renderização da Tela de Sucesso Local (Modo Embedded)
+    if (isSuccess) {
+        return (
+            <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden h-full flex flex-col items-center justify-center text-center animate-fade-in">
+                <div className="w-20 h-20 bg-neon-cyan/10 rounded-full flex items-center justify-center mb-6 border border-neon-cyan/20">
+                    <CheckCircle className="w-10 h-10 text-neon-cyan" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">Solicitação Recebida!</h3>
+                <p className="text-gray-400 text-base leading-relaxed max-w-sm mb-8">
+                    Nossa equipe analisará seu projeto. <br/>
+                    Em breve entraremos em contato via WhatsApp ou E-mail.
+                </p>
+                <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-sm text-gray-500">
+                    Você pode fechar esta janela e continuar sua leitura.
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden h-full">
+        <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden h-full flex flex-col">
              <div className="absolute top-0 left-0 h-1 bg-gray-800 w-full">
                  <div className="h-full bg-grad-cyan transition-all duration-500 ease-out shadow-[0_0_10px_#00e2ff]" style={{ width: progressWidth }}></div>
              </div>
 
-             <div className="mb-6 flex justify-between items-center">
+             <div className="mb-6 flex justify-between items-center shrink-0">
                  <span className="text-gray-500 text-xs font-mono">PASSO {step} DE 3</span>
                  {step > 1 && (
                      <button onClick={handlePrev} className="text-gray-400 hover:text-white flex items-center gap-1 text-sm">
@@ -54,7 +84,7 @@ const MultiStepForm: React.FC = () => {
                  )}
              </div>
 
-             <div className="min-h-[350px]">
+             <div className="flex-grow flex flex-col justify-center min-h-[300px]">
                  {step === 1 && (
                      <div className="space-y-5 animate-fade-in-up">
                          <h3 className="text-2xl md:text-3xl font-bold mb-2">Vamos começar!</h3>
@@ -117,7 +147,7 @@ const MultiStepForm: React.FC = () => {
                  )}
 
                  {step === 3 && (
-                     <div className="space-y-6 animate-fade-in-up text-center pt-8">
+                     <div className="space-y-6 animate-fade-in-up text-center pt-4">
                          <div className="w-16 h-16 md:w-20 md:h-20 bg-neon-cyan/10 rounded-full flex items-center justify-center mx-auto mb-6">
                              {loading ? (
                                 <div className="w-10 h-10 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
@@ -140,7 +170,7 @@ const MultiStepForm: React.FC = () => {
                  )}
              </div>
 
-             <div className="mt-6 pt-6 border-t border-white/5 flex justify-end">
+             <div className="mt-6 pt-6 border-t border-white/5 flex justify-end shrink-0">
                  {step < 3 ? (
                      <button 
                         onClick={handleNext}

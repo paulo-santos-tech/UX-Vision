@@ -3,13 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import { fetchProjectById } from '../services/supabaseService';
 import { Project } from '../types';
 import ScrollAnimation from '../components/ScrollAnimation';
-import { ArrowLeft, ArrowUpRight, User, Code2, Layers, CheckCircle2, X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import MultiStepForm from '../components/MultiStepForm';
+import { ArrowLeft, ArrowUpRight, User, Code2, Layers, CheckCircle2, X, ChevronLeft, ChevronRight, Maximize2, Rocket, CheckCircle, ArrowRight } from 'lucide-react';
 
 const ProjectDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+    // Estado do Modal de Orçamento
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -22,6 +26,13 @@ const ProjectDetails: React.FC = () => {
         load();
         window.scrollTo(0, 0);
     }, [id]);
+
+    // Trava o scroll quando modal ou lightbox estão abertos
+    useEffect(() => {
+        if (isModalOpen || lightboxIndex !== null) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = 'auto';
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [isModalOpen, lightboxIndex]);
 
     const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
@@ -44,12 +55,8 @@ const ProjectDetails: React.FC = () => {
         };
 
         window.addEventListener('keydown', handleKeyDown);
-        if (lightboxIndex !== null) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = 'auto';
-
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'auto';
         };
     }, [lightboxIndex, closeLightbox, nextImage, prevImage]);
 
@@ -159,17 +166,39 @@ const ProjectDetails: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* SIDEBAR - TECH STACK E CTA */}
                     <div className="lg:col-span-4">
                         <ScrollAnimation delay={0.3}>
-                            <div className="lg:sticky lg:top-32 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-8">
-                                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Code2 className="text-neon-cyan" size={20} /> Tech Stack</h3>
-                                <div className="space-y-3">
-                                    {project.technologies.map((tech, i) => (
-                                        <div key={i} className="group flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5 hover:border-neon-purple/50 transition-all">
-                                            <span className="text-gray-300 font-medium text-sm">{tech}</span>
-                                            <CheckCircle2 size={16} className="text-gray-600 group-hover:text-neon-purple transition-colors" />
-                                        </div>
-                                    ))}
+                            <div className="lg:sticky lg:top-32 space-y-8">
+                                
+                                {/* 1. Tech Stack Card */}
+                                <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-8">
+                                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Code2 className="text-neon-cyan" size={20} /> Tech Stack</h3>
+                                    <div className="space-y-3">
+                                        {project.technologies.map((tech, i) => (
+                                            <div key={i} className="group flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5 hover:border-neon-purple/50 transition-all">
+                                                <span className="text-gray-300 font-medium text-sm">{tech}</span>
+                                                <CheckCircle2 size={16} className="text-gray-600 group-hover:text-neon-purple transition-colors" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 2. CTA Banner (Anúncio) */}
+                                <div className="bg-gradient-to-br from-[#1a1a1a] to-black border border-white/10 rounded-2xl p-6 relative overflow-hidden group shadow-2xl">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-neon-purple/20 rounded-full blur-[50px] group-hover:bg-neon-purple/30 transition-all"></div>
+                                    
+                                    <Rocket className="w-8 h-8 text-neon-cyan mb-4" />
+                                    <h3 className="text-xl font-bold text-white mb-2">Gostou deste projeto?</h3>
+                                    <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                                        Podemos criar algo exclusivo e escalável para o seu negócio.
+                                    </p>
+                                    <button 
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-neon-cyan transition-colors shadow-lg shadow-neon-cyan/10 flex items-center justify-center gap-2"
+                                    >
+                                        Solicitar Orçamento <ArrowRight size={16}/>
+                                    </button>
                                 </div>
                             </div>
                         </ScrollAnimation>
@@ -210,6 +239,7 @@ const ProjectDetails: React.FC = () => {
                 )}
             </div>
 
+            {/* LIGHTBOX DE IMAGENS */}
             {lightboxIndex !== null && project.gallery && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl animate-fade-in p-4">
                     
@@ -260,6 +290,41 @@ const ProjectDetails: React.FC = () => {
                     >
                         <ChevronRight size={32} />
                     </button>
+                </div>
+            )}
+
+            {/* MODAL DE ORÇAMENTO (Igual ao do Blog) */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 animate-fade-in">
+                    <div className="relative w-full max-w-4xl bg-bg-dark rounded-3xl shadow-2xl overflow-hidden border border-white/10 animate-scale-up">
+                        <button 
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-red-500/20 text-white hover:text-red-500 rounded-full transition-colors border border-white/10"
+                        >
+                            <X size={24} />
+                        </button>
+                        
+                        <div className="grid lg:grid-cols-2">
+                             <div className="hidden lg:flex flex-col justify-center p-12 bg-white/[0.02] relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-neon-purple/10 to-transparent"></div>
+                                <div className="relative z-10">
+                                    <h2 className="text-4xl font-bold mb-6">Vamos escalar seu negócio?</h2>
+                                    <p className="text-gray-400 mb-8 leading-relaxed">
+                                        Nossa equipe está pronta para entender seus desafios e propor uma solução digital sob medida.
+                                    </p>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Análise de Requisitos</li>
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Proposta Técnica Detalhada</li>
+                                        <li className="flex items-center gap-3 text-sm text-gray-300"><CheckCircle size={16} className="text-neon-cyan" /> Cronograma de Execução</li>
+                                    </ul>
+                                </div>
+                             </div>
+                             
+                             <div className="p-1">
+                                <MultiStepForm embedded={true} />
+                             </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
