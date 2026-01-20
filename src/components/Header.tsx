@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronRight, User } from 'lucide-react';
+import { Menu, X, ChevronRight, User, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../logo.svg'; // Importação correta do logo na pasta src
 
@@ -106,6 +106,7 @@ const Header: React.FC = () => {
                         alt="UX Vision Logo" 
                         className="h-10 md:h-12 w-auto object-contain" 
                     />
+                    <span className="tracking-tight text-white font-bold text-xl md:text-2xl group-hover:text-neon-purple transition-colors">UX Vision</span>
                 </Link>
 
                 <nav className="hidden lg:flex items-center gap-8">
@@ -121,13 +122,16 @@ const Header: React.FC = () => {
                         </a>
                     ))}
                     
-                    <Link 
-                        to="/ux-vision-cms" 
+                    {/* LINK EXTERNO PARA O CMS */}
+                    <a 
+                        href="https://cms.uxvision.com.br/" 
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="ml-4 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all border border-transparent hover:border-white/10"
-                        title="Acesso CMS"
+                        title="Acesso CMS Externo"
                     >
                         <User size={20} />
-                    </Link>
+                    </a>
 
                     <a href="#contact" onClick={(e) => handleNavClick(e, 'contact', 'anchor')} className="bg-white/10 hover:bg-neon-purple/20 border border-white/20 hover:border-neon-purple text-white px-6 py-2.5 rounded-full font-semibold text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-neon-purple/20">
                         Orçamento
@@ -176,14 +180,16 @@ const Header: React.FC = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.4 }}
                             >
-                                <Link 
-                                    to="/ux-vision-cms"
+                                <a 
+                                    href="https://cms.uxvision.com.br/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     onClick={() => setIsOpen(false)}
                                     className="flex items-center justify-between p-4 border-b border-white/5 text-xl font-bold text-gray-400 hover:text-white transition-all duration-300 group"
                                 >
-                                    Acesso CMS
-                                    <User size={20} />
-                                </Link>
+                                    Acesso CMS Externo
+                                    <ExternalLink size={20} />
+                                </a>
                             </motion.div>
 
                             <motion.div 
