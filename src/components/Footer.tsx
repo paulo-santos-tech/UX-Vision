@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Rocket, Instagram, Linkedin, Github, Mail, MapPin, Smartphone, CheckCircle, Loader2 } from 'lucide-react';
+import { Rocket, Instagram, Linkedin, Github, Mail, MapPin, CheckCircle, Loader2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
 import logo from '../logo.svg'; // Importação do logo
+import { FaWhatsapp } from 'react-icons/fa';
 
 // Mesma estrutura do Header para consistência
 const FOOTER_NAV_LINKS = [
@@ -153,7 +154,7 @@ const Footer: React.FC = () => {
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5 mt-1">
                                     <MapPin className="w-5 h-5 text-neon-purple" />
                                 </div>
-                                <span className="leading-relaxed">Av. Paulista, 1000 - SP<br/>Brasil</span>
+                                <span className="leading-relaxed">Ourinhos - SP<br/>Brasil</span>
                             </li>
                             {/* ✏️ EMAIL */}
                             <li className="flex items-center gap-4">
@@ -165,7 +166,7 @@ const Footer: React.FC = () => {
                             {/* ✏️ TELEFONE */}
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
-                                    <Smartphone className="w-5 h-5 text-neon-purple" />
+                                    <FaWhatsapp className="w-5 h-5 text-neon-purple" />
                                 </div>
                                 <span>(14) 99820-3321</span>
                             </li>
