@@ -102,7 +102,11 @@ const BlogPost: React.FC = () => {
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Voltar ao Blog
                 </Link>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+                {/* 
+                    Adicionado 'items-start' para garantir que a sidebar possa ser 'sticky'. 
+                    Sem isso, a coluna estica até o final e o sticky não funciona.
+                */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
                     
                     {/* --- MAIN CONTENT (LEFT COL) --- */}
                     <div className="lg:col-span-2">
@@ -151,13 +155,13 @@ const BlogPost: React.FC = () => {
                                     prose-p:font-light prose-p:text-lg md:prose-p:text-xl prose-p:leading-[2.2]
                                     prose-strong:text-white prose-strong:font-bold
                                     
-                                    /* --- ESPAÇAMENTO DOS PARÁGRAFOS (RESPIRO) --- */
-                                    prose-p:mb-10 md:prose-p:mb-12
+                                    /* --- ESPAÇAMENTO DOS PARÁGRAFOS (AUMENTADO) --- */
+                                    prose-p:mb-12
                                     
                                     /* --- TÍTULOS (HEADINGS) - HIERARQUIA VISUAL --- */
                                     prose-headings:text-white prose-headings:font-bold prose-headings:scroll-mt-32
                                     
-                                    /* H2 - Principal (Maior destaque e separação) */
+                                    /* H2 - Principal */
                                     prose-h2:text-3xl md:prose-h2:text-4xl 
                                     prose-h2:mt-20 md:prose-h2:mt-24 
                                     prose-h2:mb-8 md:prose-h2:mb-10 
@@ -249,91 +253,97 @@ const BlogPost: React.FC = () => {
                     </div>
 
                     {/* --- SIDEBAR (RIGHT COL) --- */}
-                    <div className="lg:col-span-1 space-y-12">
-                        
-                        {/* 1. Ad Banner */}
-                        <ScrollAnimation delay={0.1}>
-                            <div className="bg-gradient-to-br from-[#1a1a1a] to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group sticky top-32 shadow-2xl">
-                                <div className="absolute top-0 right-0 w-40 h-40 bg-neon-purple/20 rounded-full blur-[60px] group-hover:bg-neon-purple/30 transition-all"></div>
-                                
-                                <Rocket className="w-12 h-12 text-neon-cyan mb-6" />
-                                <h3 className="text-2xl font-bold text-white mb-3">Quer um site ou sistema como este?</h3>
-                                <p className="text-gray-400 text-base mb-8 leading-relaxed">
-                                    Transforme sua ideia em realidade digital. Desenvolvimento high-end focado em performance e conversão.
-                                </p>
-                                <button 
-                                    onClick={() => setIsModalOpen(true)}
-                                    className="block w-full text-center py-4 bg-white text-black font-bold rounded-xl hover:bg-neon-cyan transition-colors shadow-lg shadow-neon-cyan/10"
-                                >
-                                    Solicitar Orçamento
-                                </button>
-                            </div>
-                        </ScrollAnimation>
-
-                        {/* 2. Related Posts */}
-                        <ScrollAnimation delay={0.2}>
-                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8">
-                                <h3 className="text-xl font-bold text-white mb-8 border-l-4 border-neon-purple pl-4">
-                                    Relacionados
-                                </h3>
-                                <div className="space-y-8">
-                                    {relatedPosts.map(rel => (
-                                        <Link to={`/blog/${rel.slug}`} key={rel.id} className="group flex gap-5 items-start">
-                                            <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-white/10">
-                                                <img src={rel.image_url} alt={rel.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            </div>
-                                            <div>
-                                                <span className="text-[10px] font-bold text-neon-cyan uppercase tracking-wider mb-1 block">{rel.category}</span>
-                                                <h4 className="text-base font-bold text-gray-200 group-hover:text-white transition-colors line-clamp-2 mb-2 leading-snug">
-                                                    {rel.title}
-                                                </h4>
-                                                <span className="text-xs text-gray-500">{rel.date}</span>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        </ScrollAnimation>
-
-                        {/* 3. Newsletter Mini (FUNCIONAL) */}
-                        <ScrollAnimation delay={0.3}>
-                            <div className="bg-grad-purple p-8 rounded-3xl text-center relative overflow-hidden shadow-neon-purple/20 shadow-xl">
-                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                                <div className="relative z-10">
-                                    <h3 className="text-2xl font-bold text-white mb-2">Newsletter VIP</h3>
-                                    <p className="text-white/80 text-sm mb-6">Receba dicas exclusivas semanalmente.</p>
+                    <div className="lg:col-span-1">
+                        {/* 
+                            STICKY CONTAINER
+                            A classe 'sticky top-32' faz este container inteiro (Banner + Related + Newsletter)
+                            fixar na tela quando o usuário rola para baixo, mas apenas no Desktop (lg:).
+                        */}
+                        <div className="space-y-12 lg:sticky lg:top-32">
+                            
+                            {/* 1. Ad Banner */}
+                            <ScrollAnimation delay={0.1}>
+                                <div className="bg-gradient-to-br from-[#1a1a1a] to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group shadow-2xl">
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-neon-purple/20 rounded-full blur-[60px] group-hover:bg-neon-purple/30 transition-all"></div>
                                     
-                                    <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                                        <input 
-                                            type="email" 
-                                            required
-                                            placeholder="Email" 
-                                            className="w-full bg-black/20 border border-white/20 rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:bg-black/30 transition-all"
-                                            value={newsletterEmail}
-                                            onChange={(e) => setNewsletterEmail(e.target.value)}
-                                            disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
-                                        />
-                                        <button 
-                                            type="submit"
-                                            disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
-                                            className="bg-white text-purple-700 p-3 rounded-xl hover:bg-gray-100 hover:scale-105 transition-all flex items-center justify-center min-w-[48px]"
-                                        >
-                                            {newsletterStatus === 'loading' ? (
-                                                <Loader2 className="animate-spin" size={20} />
-                                            ) : newsletterStatus === 'success' ? (
-                                                <CheckCircle size={20} />
-                                            ) : (
-                                                <ArrowRight size={20} />
-                                            )}
-                                        </button>
-                                    </form>
-                                    {newsletterStatus === 'success' && (
-                                        <p className="text-white text-xs mt-2 font-bold bg-black/20 rounded px-2 py-1 inline-block">Cadastrado!</p>
-                                    )}
+                                    <Rocket className="w-12 h-12 text-neon-cyan mb-6" />
+                                    <h3 className="text-2xl font-bold text-white mb-3">Quer um site ou sistema como este?</h3>
+                                    <p className="text-gray-400 text-base mb-8 leading-relaxed">
+                                        Transforme sua ideia em realidade digital. Desenvolvimento high-end focado em performance e conversão.
+                                    </p>
+                                    <button 
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="block w-full text-center py-4 bg-white text-black font-bold rounded-xl hover:bg-neon-cyan transition-colors shadow-lg shadow-neon-cyan/10"
+                                    >
+                                        Solicitar Orçamento
+                                    </button>
                                 </div>
-                            </div>
-                        </ScrollAnimation>
+                            </ScrollAnimation>
 
+                            {/* 2. Related Posts */}
+                            <ScrollAnimation delay={0.2}>
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8">
+                                    <h3 className="text-xl font-bold text-white mb-8 border-l-4 border-neon-purple pl-4">
+                                        Relacionados
+                                    </h3>
+                                    <div className="space-y-8">
+                                        {relatedPosts.map(rel => (
+                                            <Link to={`/blog/${rel.slug}`} key={rel.id} className="group flex gap-5 items-start">
+                                                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                                                    <img src={rel.image_url} alt={rel.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-neon-cyan uppercase tracking-wider mb-1 block">{rel.category}</span>
+                                                    <h4 className="text-base font-bold text-gray-200 group-hover:text-white transition-colors line-clamp-2 mb-2 leading-snug">
+                                                        {rel.title}
+                                                    </h4>
+                                                    <span className="text-xs text-gray-500">{rel.date}</span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </ScrollAnimation>
+
+                            {/* 3. Newsletter Mini (FUNCIONAL) */}
+                            <ScrollAnimation delay={0.3}>
+                                <div className="bg-grad-purple p-8 rounded-3xl text-center relative overflow-hidden shadow-neon-purple/20 shadow-xl">
+                                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                                    <div className="relative z-10">
+                                        <h3 className="text-2xl font-bold text-white mb-2">Newsletter VIP</h3>
+                                        <p className="text-white/80 text-sm mb-6">Receba dicas exclusivas semanalmente.</p>
+                                        
+                                        <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                                            <input 
+                                                type="email" 
+                                                required
+                                                placeholder="Email" 
+                                                className="w-full bg-black/20 border border-white/20 rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:bg-black/30 transition-all"
+                                                value={newsletterEmail}
+                                                onChange={(e) => setNewsletterEmail(e.target.value)}
+                                                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                                            />
+                                            <button 
+                                                type="submit"
+                                                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                                                className="bg-white text-purple-700 p-3 rounded-xl hover:bg-gray-100 hover:scale-105 transition-all flex items-center justify-center min-w-[48px]"
+                                            >
+                                                {newsletterStatus === 'loading' ? (
+                                                    <Loader2 className="animate-spin" size={20} />
+                                                ) : newsletterStatus === 'success' ? (
+                                                    <CheckCircle size={20} />
+                                                ) : (
+                                                    <ArrowRight size={20} />
+                                                )}
+                                            </button>
+                                        </form>
+                                        {newsletterStatus === 'success' && (
+                                            <p className="text-white text-xs mt-2 font-bold bg-black/20 rounded px-2 py-1 inline-block">Cadastrado!</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </ScrollAnimation>
+                        </div>
                     </div>
                 </div>
             </div>
