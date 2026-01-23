@@ -6,7 +6,7 @@ import ScrollAnimation from '../components/ScrollAnimation';
 import MultiStepForm from '../components/MultiStepForm';
 import { fetchProjects, fetchBlogPosts } from '../services/supabaseService';
 import { Project, BlogPost } from '../types';
-import { Code, ShoppingCart, Layout, Smartphone, ArrowRight, Zap, ArrowUpRight, Search, PenTool, Cpu, Rocket, Mail, Users, Target, Award, ChevronRight } from 'lucide-react';
+import { Code, ShoppingCart, Layout, Smartphone, ArrowRight, Zap, ArrowUpRight, Search, PenTool, Cpu, Rocket, Mail, Users, Target, Award, ChevronRight, Tag } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const Home: React.FC = () => {
@@ -299,21 +299,40 @@ const Home: React.FC = () => {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* 🟢 LISTA DE POSTS (LIMITADO A 3) */}
+                        {/* 🟢 LISTA DE POSTS (LIMITADO A 3) - ESTILO IGUAL AO BLOG ALL */}
                         {blogPosts.slice(0, 3).map((post, idx) => (
                             <ScrollAnimation key={post.id} delay={idx * 0.1}>
-                                <Link to={`/blog/${post.slug}`} className="group cursor-pointer">
-                                    <div className="h-[240px] md:h-[260px] rounded-3xl overflow-hidden mb-6 relative border border-white/5">
-                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"></div>
-                                        <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                        <div className="absolute top-4 left-4 z-20">
-                                            <span className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider text-white border border-white/10">
-                                                {post.category}
-                                            </span>
+                                <Link to={`/blog/${post.slug}`} className="group block h-full">
+                                    <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-neon-cyan/50 transition-all h-full flex flex-col hover:shadow-2xl hover:shadow-neon-cyan/5">
+                                        <div className="h-56 overflow-hidden relative">
+                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"></div>
+                                            <img 
+                                                src={post.image_url} 
+                                                alt={post.title} 
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                        </div>
+                                        <div className="p-8 flex flex-col flex-grow">
+                                            {/* Categoria e Leitura */}
+                                            <div className="mb-4 flex items-center justify-between">
+                                                <span className="flex items-center gap-2 text-neon-cyan font-bold text-xs uppercase tracking-widest bg-neon-cyan/10 px-3 py-1 rounded-lg border border-neon-cyan/20">
+                                                    <Tag size={12} /> {post.category}
+                                                </span>
+                                                <span className="text-gray-600 text-xs">{post.readTime}</span>
+                                            </div>
+
+                                            <h3 className="text-2xl font-bold mb-3 group-hover:text-neon-purple transition-colors leading-tight flex-grow">
+                                                {post.title}
+                                            </h3>
+                                            <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed mb-6">
+                                                {post.excerpt}
+                                            </p>
+                                            
+                                            <div className="flex items-center gap-2 text-white font-bold text-sm uppercase tracking-wide mt-auto group-hover:gap-3 transition-all">
+                                                Ler Artigo <ArrowUpRight size={16} className="text-neon-purple" />
+                                            </div>
                                         </div>
                                     </div>
-                                    <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-neon-cyan transition-colors leading-tight">{post.title}</h3>
-                                    <p className="text-gray-400 text-sm md:text-base line-clamp-2 leading-relaxed">{post.excerpt}</p>
                                 </Link>
                             </ScrollAnimation>
                         ))}

@@ -30,7 +30,7 @@ const AnalyticsTracker = () => {
     const trackView = async () => {
       try {
         await analyticsSupabase.from('page_analytics').insert([{
-          path: location.pathname + location.search, // Captura rota completa (/blog, /project/1, etc)
+          path: location.pathname + location.search, 
           referrer: document.referrer,
           user_agent: navigator.userAgent
         }]);
@@ -40,7 +40,7 @@ const AnalyticsTracker = () => {
     };
 
     trackView();
-  }, [location]); // Executa toda vez que a URL muda
+  }, [location]); 
 
   return null;
 };
@@ -69,7 +69,6 @@ const ScrollToAnchor = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      {/* Utilitários de Navegação e Rastreamento */}
       <ScrollToAnchor />
       <AnalyticsTracker />
 
@@ -86,8 +85,6 @@ const App: React.FC = () => {
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/thank-you" element={<ThankYou />} />
-            
-            {/* Páginas de Login e Admin removidas conforme solicitado */}
             
             <Route path="*" element={<NotFound />} />
           </Routes>

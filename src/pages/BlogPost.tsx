@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { fetchPostBySlug, fetchRelatedPosts } from '../services/supabaseService';
 import { subscribeNewsletter } from '../services/emailService';
 import { BlogPost as BlogPostType } from '../types';
-import { ArrowLeft, Calendar, Clock, User, Linkedin, Twitter, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, Linkedin, Facebook, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle, X } from 'lucide-react';
 import ScrollAnimation from '../components/ScrollAnimation';
 import MultiStepForm from '../components/MultiStepForm';
 
@@ -103,10 +103,11 @@ const BlogPost: React.FC = () => {
                 </Link>
 
                 {/* 
-                    Adicionado 'items-start' para garantir que a sidebar possa ser 'sticky'. 
-                    Sem isso, a coluna estica até o final e o sticky não funciona.
+                   CORREÇÃO DO STICKY: 
+                   Removemos 'items-start'. Agora as colunas têm a mesma altura (stretch).
+                   Isso permite que a div interna (sticky) flutue dentro da coluna da direita.
                 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 relative">
                     
                     {/* --- MAIN CONTENT (LEFT COL) --- */}
                     <div className="lg:col-span-2">
@@ -151,79 +152,56 @@ const BlogPost: React.FC = () => {
                                     prose prose-lg md:prose-xl prose-invert max-w-none
                                     text-gray-300
                                     
-                                    /* --- TIPOGRAFIA E LEITURA --- */
-                                    prose-p:font-light prose-p:text-lg md:prose-p:text-xl prose-p:leading-[2.2]
-                                    prose-strong:text-white prose-strong:font-bold
+                                    /* --- TIPOGRAFIA GERAL --- */
+                                    /* leading-[1.8] diminui um pouco a altura em relação ao leading-loose (2.0) */
+                                    leading-relaxed md:leading-[1.8]
                                     
-                                    /* --- ESPAÇAMENTO DOS PARÁGRAFOS (AUMENTADO) --- */
-                                    prose-p:mb-12
+                                    /* --- PARÁGRAFOS (ESPAÇAMENTO AUMENTADO) --- */
+                                    /* 'mb-16' aumenta o espaço entre os parágrafos para separar bem os blocos */
+                                    prose-p:font-light 
+                                    prose-p:text-lg md:prose-p:text-xl 
+                                    prose-p:mb-16
+                                    prose-p:mt-0
                                     
-                                    /* --- TÍTULOS (HEADINGS) - HIERARQUIA VISUAL --- */
-                                    prose-headings:text-white prose-headings:font-bold prose-headings:scroll-mt-32
+                                    /* --- TÍTULOS --- */
+                                    prose-headings:text-white 
+                                    prose-headings:font-bold 
+                                    prose-headings:scroll-mt-32
                                     
-                                    /* H2 - Principal */
                                     prose-h2:text-3xl md:prose-h2:text-4xl 
-                                    prose-h2:mt-20 md:prose-h2:mt-24 
-                                    prose-h2:mb-8 md:prose-h2:mb-10 
-                                    prose-h2:text-neon-cyan prose-h2:leading-tight
+                                    prose-h2:mt-24 
+                                    prose-h2:mb-10 
+                                    prose-h2:text-neon-cyan 
+                                    prose-h2:leading-tight
 
-                                    /* H3 - Subtítulo */
                                     prose-h3:text-2xl md:prose-h3:text-3xl 
-                                    prose-h3:mt-16 md:prose-h3:mt-20 
-                                    prose-h3:mb-6 md:prose-h3:mb-8 
-                                    prose-h3:text-white prose-h3:leading-tight
+                                    prose-h3:mt-20 
+                                    prose-h3:mb-8 
+                                    prose-h3:text-white 
+                                    prose-h3:leading-tight
 
-                                    /* H4 - Tópicos */
                                     prose-h4:text-xl md:prose-h4:text-2xl 
-                                    prose-h4:mt-12 md:prose-h4:mt-16 
-                                    prose-h4:mb-4 md:prose-h4:mb-6 
-                                    prose-h4:text-neon-purple prose-h4:uppercase prose-h4:tracking-widest
-
-                                    /* H5 - Detalhes */
-                                    prose-h5:text-lg md:prose-h5:text-xl
-                                    prose-h5:mt-10 md:prose-h5:mt-12
-                                    prose-h5:mb-4
-                                    prose-h5:text-gray-200
+                                    prose-h4:mt-16 
+                                    prose-h4:mb-6 
+                                    prose-h4:text-neon-purple 
+                                    prose-h4:uppercase 
+                                    prose-h4:tracking-widest
                                     
-                                    /* --- LINKS --- */
-                                    prose-a:text-neon-cyan prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-white transition-colors
-                                    
-                                    /* --- LISTAS --- */
-                                    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-10 prose-li:marker:text-neon-purple prose-li:mb-3 prose-li:pl-2
-                                    prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-10 prose-li:marker:text-neon-cyan
-                                    
-                                    /* --- CITAÇÕES (BLOCKQUOTES) --- */
+                                    /* --- CITAÇÕES --- */
                                     prose-blockquote:border-l-4 prose-blockquote:border-neon-purple 
                                     prose-blockquote:bg-white/[0.03] prose-blockquote:py-8 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl 
-                                    prose-blockquote:text-xl prose-blockquote:italic prose-blockquote:text-gray-200 prose-blockquote:not-italic prose-blockquote:font-light
+                                    prose-blockquote:text-xl prose-blockquote:italic prose-blockquote:text-gray-200 
                                     prose-blockquote:my-16 prose-blockquote:shadow-lg
                                     
-                                    /* --- IMAGENS --- */
+                                    /* --- IMAGENS E LINKS --- */
                                     prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:my-16 prose-img:shadow-2xl prose-img:w-full
+                                    prose-a:text-neon-cyan prose-a:no-underline hover:prose-a:underline hover:prose-a:text-white transition-colors
                                     
-                                    /* --- CÓDIGOS E HR --- */
-                                    prose-code:text-neon-cyan prose-code:bg-white/5 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:font-mono prose-code:text-sm prose-code:border prose-code:border-white/10
-                                    prose-hr:border-white/10 prose-hr:my-20
+                                    /* --- LISTAS --- */
+                                    prose-ul:my-10 prose-li:mb-4
+                                    prose-ol:my-10
                                 ">
                                     <div dangerouslySetInnerHTML={{ __html: post.content || post.excerpt }} />
-                                    
-                                    {!post.content && (
-                                        <div className="space-y-8">
-                                            <p className="text-xl leading-relaxed text-gray-200 font-light">A tecnologia evolui a passos largos, e acompanhar essas mudanças é crucial para qualquer negócio digital. Neste artigo, exploramos como as novas ferramentas de IA e frameworks modernos estão redefinindo a produtividade.</p>
-                                            <h2>A Importância da Performance</h2>
-                                            <p>Não basta ser bonito; tem que ser rápido. O Google Core Web Vitals tornou-se um fator de ranqueamento essencial. Sites que carregam em menos de 2 segundos têm taxas de conversão até 3x maiores.</p>
-                                            <blockquote>"O design não é apenas o que parece e o que se sente. O design é como funciona." <br/><span className="text-sm font-sans text-neon-cyan mt-4 block uppercase tracking-wider font-bold not-italic">- Steve Jobs</span></blockquote>
-                                            <h3>Pontos Chave para 2025</h3>
-                                            <ul>
-                                                <li>Arquitetura Serverless para escala infinita.</li>
-                                                <li>Design Systems para consistência visual.</li>
-                                                <li>Acessibilidade como pilar fundamental.</li>
-                                            </ul>
-                                            <p>Ao implementar arquiteturas como JAMstack ou Server Components, conseguimos entregar conteúdo dinâmico com a velocidade de arquivos estáticos. Isso muda o jogo para e-commerces e portais de conteúdo.</p>
-                                            <h2>Conclusão</h2>
-                                            <p>O futuro pertence a quem consegue unir estética, funcionalidade e velocidade. Se você está construindo seu próximo projeto, comece pensando na experiência do usuário final.</p>
-                                        </div>
-                                    )}
                                 </div>
                                 
                                 {/* Share Section */}
@@ -236,8 +214,8 @@ const BlogPost: React.FC = () => {
                                         <button onClick={() => handleShare('linkedin')} className="flex items-center gap-3 px-6 py-4 bg-[#0077b5]/10 text-[#0077b5] border border-[#0077b5]/30 rounded-2xl hover:bg-[#0077b5] hover:text-white transition-all font-bold text-sm">
                                             <Linkedin size={20} /> LinkedIn
                                         </button>
-                                        <button onClick={() => handleShare('twitter')} className="flex items-center gap-3 px-6 py-4 bg-[#1da1f2]/10 text-[#1da1f2] border border-[#1da1f2]/30 rounded-2xl hover:bg-[#1da1f2] hover:text-white transition-all font-bold text-sm">
-                                            <Twitter size={20} /> Twitter
+                                        <button onClick={() => handleShare('facebook')} className="flex items-center gap-3 px-6 py-4 bg-[#1877F2]/10 text-[#1877F2] border border-[#1877F2]/30 rounded-2xl hover:bg-[#1877F2] hover:text-white transition-all font-bold text-sm">
+                                            <Facebook size={20} /> Facebook
                                         </button>
                                         <button onClick={() => handleShare('whatsapp')} className="flex items-center gap-3 px-6 py-4 bg-[#25d366]/10 text-[#25d366] border border-[#25d366]/30 rounded-2xl hover:bg-[#25d366] hover:text-white transition-all font-bold text-sm">
                                             WhatsApp
@@ -253,11 +231,13 @@ const BlogPost: React.FC = () => {
                     </div>
 
                     {/* --- SIDEBAR (RIGHT COL) --- */}
-                    <div className="lg:col-span-1">
+                    {/* A coluna se estica para acompanhar a altura do Main Content */}
+                    <div className="lg:col-span-1 h-full">
                         {/* 
                             STICKY CONTAINER
-                            A classe 'sticky top-32' faz este container inteiro (Banner + Related + Newsletter)
-                            fixar na tela quando o usuário rola para baixo, mas apenas no Desktop (lg:).
+                            - 'sticky': ativa o comportamento
+                            - 'top-32': define a distância do topo
+                            - Este elemento vai deslizar dentro da coluna 'lg:col-span-1'
                         */}
                         <div className="space-y-12 lg:sticky lg:top-32">
                             
@@ -305,7 +285,7 @@ const BlogPost: React.FC = () => {
                                 </div>
                             </ScrollAnimation>
 
-                            {/* 3. Newsletter Mini (FUNCIONAL) */}
+                            {/* 3. Newsletter Mini */}
                             <ScrollAnimation delay={0.3}>
                                 <div className="bg-grad-purple p-8 rounded-3xl text-center relative overflow-hidden shadow-neon-purple/20 shadow-xl">
                                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
