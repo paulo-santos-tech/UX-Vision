@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchPostBySlug, fetchRelatedPosts } from '../services/supabaseService';
 import { subscribeNewsletter } from '../services/emailService';
 import { BlogPost as BlogPostType } from '../types';
-import { ArrowLeft, Calendar, Clock, User, Linkedin, Facebook, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, Linkedin, Facebook, Link as LinkIcon, Share2, Rocket, ArrowRight, Loader2, CheckCircle, X, Hash } from 'lucide-react';
 import ScrollAnimation from '../components/ScrollAnimation';
 import MultiStepForm from '../components/MultiStepForm';
 
@@ -30,6 +31,9 @@ const BlogPost: React.FC = () => {
                     setPost(data);
                     const related = await fetchRelatedPosts(slug, data.category);
                     setRelatedPosts(related);
+                    
+                    // SEO Básico: Atualiza o título da aba
+                    document.title = data.meta_title || `${data.title} | UX Vision Blog`;
                 } else {
                     setPost(null);
                 }
@@ -38,6 +42,9 @@ const BlogPost: React.FC = () => {
         };
         load();
         window.scrollTo(0, 0);
+        
+        // Cleanup: volta o título ao normal ao sair
+        return () => { document.title = 'UX Vision | Digital Experiences'; };
     }, [slug]);
 
     useEffect(() => {
@@ -102,11 +109,6 @@ const BlogPost: React.FC = () => {
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Voltar ao Blog
                 </Link>
 
-                {/* 
-                   CORREÇÃO DO STICKY: 
-                   Removemos 'items-start'. Agora as colunas têm a mesma altura (stretch).
-                   Isso permite que a div interna (sticky) flutue dentro da coluna da direita.
-                */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 relative">
                     
                     {/* --- MAIN CONTENT (LEFT COL) --- */}
@@ -151,61 +153,39 @@ const BlogPost: React.FC = () => {
                                 <div className="
                                     prose prose-lg md:prose-xl prose-invert max-w-none
                                     text-gray-300
-                                    
-                                    /* --- TIPOGRAFIA GERAL --- */
-                                    /* leading-[1.8] diminui um pouco a altura em relação ao leading-loose (2.0) */
                                     leading-relaxed md:leading-[1.8]
-                                    
-                                    /* --- PARÁGRAFOS (ESPAÇAMENTO AUMENTADO) --- */
-                                    /* 'mb-16' aumenta o espaço entre os parágrafos para separar bem os blocos */
                                     prose-p:font-light 
                                     prose-p:text-lg md:prose-p:text-xl 
-                                    prose-p:mb-16
-                                    prose-p:mt-0
-                                    
-                                    /* --- TÍTULOS --- */
-                                    prose-headings:text-white 
-                                    prose-headings:font-bold 
-                                    prose-headings:scroll-mt-32
-                                    
-                                    prose-h2:text-3xl md:prose-h2:text-4xl 
-                                    prose-h2:mt-24 
-                                    prose-h2:mb-10 
-                                    prose-h2:text-neon-cyan 
-                                    prose-h2:leading-tight
-
-                                    prose-h3:text-2xl md:prose-h3:text-3xl 
-                                    prose-h3:mt-20 
-                                    prose-h3:mb-8 
-                                    prose-h3:text-white 
-                                    prose-h3:leading-tight
-
-                                    prose-h4:text-xl md:prose-h4:text-2xl 
-                                    prose-h4:mt-16 
-                                    prose-h4:mb-6 
-                                    prose-h4:text-neon-purple 
-                                    prose-h4:uppercase 
-                                    prose-h4:tracking-widest
-                                    
-                                    /* --- CITAÇÕES --- */
+                                    prose-p:mb-16 prose-p:mt-0
+                                    prose-headings:text-white prose-headings:font-bold prose-headings:scroll-mt-32
+                                    prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-24 prose-h2:mb-10 prose-h2:text-neon-cyan prose-h2:leading-tight
+                                    prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-20 prose-h3:mb-8 prose-h3:text-white prose-h3:leading-tight
+                                    prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-16 prose-h4:mb-6 prose-h4:text-neon-purple prose-h4:uppercase prose-h4:tracking-widest
                                     prose-blockquote:border-l-4 prose-blockquote:border-neon-purple 
                                     prose-blockquote:bg-white/[0.03] prose-blockquote:py-8 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl 
                                     prose-blockquote:text-xl prose-blockquote:italic prose-blockquote:text-gray-200 
                                     prose-blockquote:my-16 prose-blockquote:shadow-lg
-                                    
-                                    /* --- IMAGENS E LINKS --- */
                                     prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:my-16 prose-img:shadow-2xl prose-img:w-full
                                     prose-a:text-neon-cyan prose-a:no-underline hover:prose-a:underline hover:prose-a:text-white transition-colors
-                                    
-                                    /* --- LISTAS --- */
                                     prose-ul:my-10 prose-li:mb-4
                                     prose-ol:my-10
                                 ">
                                     <div dangerouslySetInnerHTML={{ __html: post.content || post.excerpt }} />
                                 </div>
                                 
+                                {/* 🟢 TAGS SECTION (NOVO) */}
+                                {post.tags && post.tags.length > 0 && (
+                                    <div className="mt-12 mb-12 flex flex-wrap gap-2">
+                                        {post.tags.map((tag, i) => (
+                                            <span key={i} className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-md text-gray-400 hover:text-white hover:border-neon-purple/50 transition-colors cursor-default">
+                                                <Hash size={12} /> {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                
                                 {/* Share Section */}
-                                <div className="mt-24 pt-12 border-t border-white/10">
+                                <div className="mt-12 pt-12 border-t border-white/10">
                                     <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
                                         <Share2 className="text-neon-purple" size={24} />
                                         Gostou? Compartilhe este artigo
@@ -231,21 +211,12 @@ const BlogPost: React.FC = () => {
                     </div>
 
                     {/* --- SIDEBAR (RIGHT COL) --- */}
-                    {/* A coluna se estica para acompanhar a altura do Main Content */}
                     <div className="lg:col-span-1 h-full">
-                        {/* 
-                            STICKY CONTAINER
-                            - 'sticky': ativa o comportamento
-                            - 'top-32': define a distância do topo
-                            - Este elemento vai deslizar dentro da coluna 'lg:col-span-1'
-                        */}
                         <div className="space-y-12 lg:sticky lg:top-32">
-                            
                             {/* 1. Ad Banner */}
                             <ScrollAnimation delay={0.1}>
                                 <div className="bg-gradient-to-br from-[#1a1a1a] to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group shadow-2xl">
                                     <div className="absolute top-0 right-0 w-40 h-40 bg-neon-purple/20 rounded-full blur-[60px] group-hover:bg-neon-purple/30 transition-all"></div>
-                                    
                                     <Rocket className="w-12 h-12 text-neon-cyan mb-6" />
                                     <h3 className="text-2xl font-bold text-white mb-3">Quer um site ou sistema como este?</h3>
                                     <p className="text-gray-400 text-base mb-8 leading-relaxed">
@@ -292,7 +263,6 @@ const BlogPost: React.FC = () => {
                                     <div className="relative z-10">
                                         <h3 className="text-2xl font-bold text-white mb-2">Newsletter VIP</h3>
                                         <p className="text-white/80 text-sm mb-6">Receba dicas exclusivas semanalmente.</p>
-                                        
                                         <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
                                             <input 
                                                 type="email" 

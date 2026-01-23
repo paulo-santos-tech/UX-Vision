@@ -1,5 +1,6 @@
+
 import { createClient } from '@supabase/supabase-js';
-import { Project, BlogPost, MicroSaas } from '../types';
+import { Project, BlogPost, MicroSaas, SiteSettings } from '../types';
 
 // ==============================================================================
 // 1. CONFIGURAÇÃO E CONEXÃO
@@ -54,7 +55,37 @@ export const getCurrentUser = async () => {
 };
 
 // ==============================================================================
-// 3. FUNÇÕES DO PORTFÓLIO
+// 3. SETTINGS (NOVO)
+// ==============================================================================
+
+let settingsCache: SiteSettings | null = null;
+
+export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
+    if (settingsCache) return settingsCache;
+
+    try {
+        // Tenta buscar a linha com ID 1 (padrão do SQL)
+        const { data, error } = await supabase
+            .from('site_settings')
+            .select('*')
+            .single();
+
+        if (error) {
+            // Se der erro (tabela vazia), retorna null mas não quebra
+            console.warn('Configurações não encontradas ou erro:', error.message);
+            return null;
+        }
+
+        settingsCache = data;
+        return data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
+
+// ==============================================================================
+// 4. FUNÇÕES DO PORTFÓLIO
 // ==============================================================================
 
 export const fetchProjects = async (): Promise<Project[]> => {
@@ -123,7 +154,7 @@ export const fetchProjectById = async (id: string): Promise<Project | undefined>
 };
 
 // ==============================================================================
-// 4. FUNÇÕES DO BLOG
+// 5. FUNÇÕES DO BLOG
 // ==============================================================================
 
 export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
@@ -149,7 +180,11 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
             content: post.content,
             author: post.author,
             readTime: post.read_time, 
-            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
+            // Novos campos
+            tags: post.tags || [],
+            meta_title: post.meta_title,
+            meta_description: post.meta_description
         }));
     } catch (err) {
         console.error(err);
@@ -177,7 +212,10 @@ export const fetchPostBySlug = async (slug: string): Promise<BlogPost | undefine
             content: data.content,
             author: data.author,
             readTime: data.read_time,
-            date: new Date(data.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+            date: new Date(data.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
+            tags: data.tags || [],
+            meta_title: data.meta_title,
+            meta_description: data.meta_description
         };
     } catch (err) {
         console.error(err);
@@ -215,7 +253,7 @@ export const fetchRelatedPosts = async (currentSlug: string, category: string): 
 };
 
 // ==============================================================================
-// 5. FUNÇÕES DE MICROSAAS
+// 6. FUNÇÕES DE MICROSAAS
 // ==============================================================================
 
 export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
@@ -234,7 +272,7 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
             id: item.id,
             name: item.name,
             description: item.description,
-            image: item.image, // Mapeando a coluna 'image' do banco
+            image: item.image,
             status: item.status,
             price: item.price,
             link: item.link,
@@ -247,7 +285,7 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
 };
 
 // ==============================================================================
-// 6. FUNÇÕES DE LEADS
+// 7. FUNÇÕES DE LEADS
 // ==============================================================================
 
 export const createLead = async (leadData: { 

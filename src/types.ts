@@ -1,14 +1,19 @@
+
+// ==============================================================================
+// TIPOS DO FRONTEND (Espelho do seu Banco de Dados)
+// ==============================================================================
+
 export interface Project {
-    id: number;
+    id: number; // No SQL é bigint (number no JS)
     title: string;
-    description: string;
-    fullDescription?: string;
+    description: string; // Descrição curta
+    fullDescription?: string; // HTML do editor (mapeado de full_description)
     challenge?: string;
     solution?: string;
-    image_url: string;
-    gallery?: string[];
+    image_url: string; // Mapeado de 'image' do banco
+    gallery?: string[]; // Array de URLs
     category: string;
-    link?: string;
+    link?: string; // Link externo
     technologies: string[];
     client?: string;
     year?: string;
@@ -20,21 +25,43 @@ export interface BlogPost {
     slug: string;
     excerpt: string;
     category: string;
-    content?: string;
-    image_url: string;
-    date?: string;
+    content?: string; // HTML
+    image_url: string; // Mapeado de 'image'
+    date?: string; // Vamos formatar o created_at
     author?: string;
-    readTime?: string;
+    readTime?: string; // Mapeado de 'read_time'
     status?: string;
+    // Novos campos adicionados baseados no SQL
+    tags?: string[];
+    meta_title?: string;
+    meta_description?: string;
 }
 
 export interface MicroSaas {
     id: number;
     name: string;
     description: string;
-    image?: string; // Novo campo para o ícone/logo
+    image?: string;
     status: 'Venda' | 'Uso' | 'Beta';
     price?: string;
     link: string;
     features: string[];
+}
+
+export interface Service {
+    icon: string;
+    title: string;
+    description: string;
+}
+
+// Nova interface baseada na tabela site_settings
+export interface SiteSettings {
+    whatsapp?: string;
+    instagram?: string;
+    linkedin?: string;
+    facebook?: string;
+    telegram?: string;
+    footer_text?: string;
+    author_name?: string;
+    contact_email?: string; // Caso adicione no futuro, ou use o hardcoded
 }

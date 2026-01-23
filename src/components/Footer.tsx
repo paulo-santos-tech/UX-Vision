@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Rocket, Instagram, Linkedin, Github, Mail, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { Rocket, Instagram, Linkedin, Mail, MapPin, Smartphone, CheckCircle, Loader2, Facebook, Send } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
-import logo from '../logo.svg'; // Importação do logo
-import { FaWhatsapp } from 'react-icons/fa';
+import { fetchSiteSettings } from '../services/supabaseService';
+import logo from '../logo.svg'; 
 
-// Mesma estrutura do Header para consistência
 const FOOTER_NAV_LINKS = [
     { name: 'Quem Somos', href: 'about', type: 'anchor' },
     { name: 'O que fazemos', href: 'services', type: 'anchor' },
@@ -23,34 +23,61 @@ const Footer: React.FC = () => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-    // --- LÓGICA DE NAVEGAÇÃO IGUAL AO HEADER ---
+    // Estado das Configurações do Site (Links dinâmicos)
+    // Inicializamos com valores padrão para não quebrar o layout se o banco estiver vazio
+    const [settings, setSettings] = useState({
+        whatsapp: '5514998203321', // Formato para link (apenas numeros)
+        whatsappDisplay: '(14) 99820-3321', // Formato visual
+        instagram: 'https://instagram.com/',
+        linkedin: 'https://linkedin.com/',
+        facebook: '',
+        telegram: '',
+        footerText: 'Transformamos ideias complexas em experiências digitais fluidas e escaláveis. O futuro do seu negócio começa com uma linha de código e um pixel perfeito.',
+        contactEmail: 'contato@uxvision.com.br'
+    });
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            const data = await fetchSiteSettings();
+            if (data) {
+                // Formata o whatsapp para display se necessário, ou usa o raw
+                setSettings(prev => ({
+                    ...prev,
+                    whatsapp: data.whatsapp ? data.whatsapp.replace(/\D/g, '') : prev.whatsapp,
+                    whatsappDisplay: data.whatsapp || prev.whatsappDisplay,
+                    instagram: data.instagram || prev.instagram,
+                    linkedin: data.linkedin || prev.linkedin,
+                    facebook: data.facebook || '',
+                    telegram: data.telegram || '',
+                    footerText: data.footer_text || prev.footerText,
+                    // Se não tiver email na tabela settings, mantemos o padrão
+                    contactEmail: prev.contactEmail 
+                }));
+            }
+        };
+        loadSettings();
+    }, []);
+
     const handleNavClick = async (e: React.MouseEvent, target: string, type: string) => {
         e.preventDefault();
-
         if (type === 'route') {
             navigate(target);
             window.scrollTo(0, 0);
         } else {
-            // Se já estiver na home, rola suave
             if (location.pathname === '/') {
                 scrollToId(target);
             } else {
-                // Se estiver em outra página, vai para home e depois rola
                 navigate('/');
                 setTimeout(() => scrollToId(target), 300);
             }
         }
     };
 
-    // Função específica para o clique no Logo do Rodapé
     const handleLogoClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        
         if (location.pathname === '/') {
-            // Se já está na home, sobe suavemente
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            // Se está em outra página, vai para home e reseta o scroll
             navigate('/');
             window.scrollTo(0, 0);
         }
@@ -66,18 +93,15 @@ const Footer: React.FC = () => {
         }
     };
 
-    // --- LÓGICA DA NEWSLETTER ---
     const handleNewsletterSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email) return;
-
         setStatus('loading');
         const result = await subscribeNewsletter(email);
-
         if (result.success) {
             setStatus('success');
             setEmail('');
-            setTimeout(() => setStatus('idle'), 5000); // Reseta após 5s
+            setTimeout(() => setStatus('idle'), 5000);
         } else {
             setStatus('error');
         }
@@ -85,7 +109,6 @@ const Footer: React.FC = () => {
 
     return (
         <footer className="relative bg-[#050505] pt-16 md:pt-24 pb-10 md:pb-12 overflow-hidden border-t border-white/5">
-             {/* Linha decorativa no topo */}
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-neon-cyan/50 to-transparent"></div>
             
             <div className="container mx-auto px-5 md:px-6 relative z-10">
@@ -93,13 +116,11 @@ const Footer: React.FC = () => {
                     
                     {/* COLUNA 1: MARCA & SOBRE */}
                     <div className="sm:col-span-2 lg:col-span-1 flex flex-col items-start">
-                        {/* 🟢 LOGO DO RODAPÉ COM SCROLL */}
                         <Link 
                             to="/" 
                             className="block mb-6 md:mb-8 hover:opacity-80 transition-opacity"
                             onClick={handleLogoClick}
                         >
-                            {/* Usando a variável importada 'logo' */}
                             <img 
                                 src={logo} 
                                 alt="UX Vision" 
@@ -107,21 +128,20 @@ const Footer: React.FC = () => {
                             />
                         </Link>
                         
-                        {/* ✏️ TEXTO DE DESCRIÇÃO DA EMPRESA */}
                         <p className="text-gray-400 text-base leading-relaxed mb-8 max-w-sm font-light">
-                            Transformamos ideias complexas em experiências digitais fluidas e escaláveis. 
-                            O futuro do seu negócio começa com uma linha de código e um pixel perfeito.
+                            {settings.footerText}
                         </p>
                         
-                        {/* 🟢 REDES SOCIAIS */}
+                        {/* REDES SOCIAIS DINÂMICAS */}
                         <div className="flex gap-4">
-                            <SocialIcon icon={<Instagram size={20} />} href="https://instagram.com/seu-perfil" />
-                            <SocialIcon icon={<Linkedin size={20} />} href="https://linkedin.com/in/seu-perfil" />
-                            <SocialIcon icon={<Github size={20} />} href="https://github.com/seu-perfil" />
+                            {settings.instagram && <SocialIcon icon={<Instagram size={20} />} href={settings.instagram} />}
+                            {settings.linkedin && <SocialIcon icon={<Linkedin size={20} />} href={settings.linkedin} />}
+                            {settings.facebook && <SocialIcon icon={<Facebook size={20} />} href={settings.facebook} />}
+                            {settings.telegram && <SocialIcon icon={<Send size={20} />} href={settings.telegram} />}
                         </div>
                     </div>
 
-                    {/* COLUNA 2: NAVEGAÇÃO RÁPIDA (Corrigida) */}
+                    {/* COLUNA 2: NAVEGAÇÃO */}
                     <div>
                         <h4 className="text-white font-bold mb-6 text-xl relative inline-block">
                             Navegação
@@ -142,38 +162,37 @@ const Footer: React.FC = () => {
                         </ul>
                     </div>
 
-                    {/* COLUNA 3: CONTATO */}
+                    {/* COLUNA 3: CONTATO DINÂMICO */}
                     <div>
                         <h4 className="text-white font-bold mb-6 text-xl relative inline-block">
                             Contato
                             <span className="absolute bottom-0 left-0 w-1/2 h-0.5 bg-neon-purple"></span>
                         </h4>
                         <ul className="space-y-4 text-base text-gray-400">
-                            {/* ✏️ ENDEREÇO */}
                             <li className="flex items-start gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5 mt-1">
                                     <MapPin className="w-5 h-5 text-neon-purple" />
                                 </div>
-                                <span className="leading-relaxed">Ourinhos - SP<br/>Brasil</span>
+                                <span className="leading-relaxed">Av. Paulista, 1000 - SP<br/>Brasil</span>
                             </li>
-                            {/* ✏️ EMAIL */}
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
                                     <Mail className="w-5 h-5 text-neon-purple" />
                                 </div>
-                                <span className="break-all">contato@uxvision.com.br</span>
+                                <a href={`mailto:${settings.contactEmail}`} className="break-all hover:text-white transition-colors">{settings.contactEmail}</a>
                             </li>
-                            {/* ✏️ TELEFONE */}
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
-                                    <FaWhatsapp className="w-5 h-5 text-neon-purple" />
+                                    <Smartphone className="w-5 h-5 text-neon-purple" />
                                 </div>
-                                <span>(14) 99820-3321</span>
+                                <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                                    {settings.whatsappDisplay}
+                                </a>
                             </li>
                         </ul>
                     </div>
 
-                    {/* COLUNA 4: NEWSLETTER (Funcional) */}
+                    {/* COLUNA 4: NEWSLETTER */}
                     <div className="sm:col-span-2 lg:col-span-1">
                         <h4 className="text-white font-bold mb-6 text-xl relative inline-block">
                             Newsletter
@@ -220,7 +239,6 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
 
-                {/* BOTTOM BAR (DIREITOS E TERMOS) */}
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-500 text-center md:text-left">
                     <p>&copy; 2025 UX Vision. Todos os direitos reservados.</p>
                     <div className="flex flex-wrap justify-center gap-6">

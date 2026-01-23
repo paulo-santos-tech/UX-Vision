@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import HeroCanvas from '../components/HeroCanvas';
 import PortfolioCarousel from '../components/PortfolioCarousel';
 import ScrollAnimation from '../components/ScrollAnimation';
 import MultiStepForm from '../components/MultiStepForm';
-import { fetchProjects, fetchBlogPosts } from '../services/supabaseService';
+import { fetchProjects, fetchBlogPosts, fetchSiteSettings } from '../services/supabaseService';
 import { Project, BlogPost } from '../types';
 import { Code, ShoppingCart, Layout, Smartphone, ArrowRight, Zap, ArrowUpRight, Search, PenTool, Cpu, Rocket, Mail, Users, Target, Award, ChevronRight, Tag } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -12,6 +13,13 @@ import { FaWhatsapp } from 'react-icons/fa';
 const Home: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+    
+    // Estado para contatos dinâmicos
+    const [contact, setContact] = useState({
+        whatsappLink: 'https://wa.me/5514998203321',
+        whatsappDisplay: '(14) 99820-3321',
+        email: 'contato@uxvision.com.br'
+    });
 
     useEffect(() => {
         const loadData = async () => {
@@ -19,6 +27,16 @@ const Home: React.FC = () => {
             setProjects(p);
             const b = await fetchBlogPosts();
             setBlogPosts(b);
+
+            // Tenta pegar configurações do banco, se não tiver, mantém o padrão
+            const settings = await fetchSiteSettings();
+            if (settings) {
+                setContact({
+                    whatsappLink: settings.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g, '')}` : 'https://wa.me/5514998203321',
+                    whatsappDisplay: settings.whatsapp || '(14) 99820-3321',
+                    email: settings.contact_email || 'contato@uxvision.com.br'
+                });
+            }
         };
         loadData();
     }, []);
@@ -367,16 +385,16 @@ const Home: React.FC = () => {
                                     <ContactInfoCard 
                                         icon={<Mail />} 
                                         title="Email" 
-                                        value="contato@uxvision.com.br" 
+                                        value={contact.email} 
                                         action="Enviar Email" 
-                                        link="mailto:contato@uxvision.com.br"
+                                        link={`mailto:${contact.email}`}
                                     />
                                     <ContactInfoCard 
                                         icon={<FaWhatsapp />} 
                                         title="WhatsApp" 
-                                        value="(14) 99820-3321" 
+                                        value={contact.whatsappDisplay} 
                                         action="Enviar Mensagem" 
-                                        link="https://wa.me/5514998203321"
+                                        link={contact.whatsappLink}
                                     />
                                 </div>
                           </div>
