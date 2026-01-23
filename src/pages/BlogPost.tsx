@@ -146,22 +146,60 @@ const BlogPost: React.FC = () => {
                                 <div className="
                                     prose prose-lg md:prose-xl prose-invert max-w-none
                                     text-gray-300
-                                    prose-headings:text-white prose-headings:font-bold prose-headings:scroll-mt-24
-                                    prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-20 prose-h2:mb-8 prose-h2:text-neon-cyan
-                                    prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:text-white
-                                    prose-h4:text-xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:text-neon-purple prose-h4:uppercase prose-h4:tracking-widest
-                                    prose-p:mb-8 prose-p:leading-[2] prose-p:font-light prose-p:text-lg
-                                    prose-a:text-neon-cyan prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-white transition-colors
+                                    
+                                    /* --- TIPOGRAFIA E LEITURA --- */
+                                    prose-p:font-light prose-p:text-lg md:prose-p:text-xl prose-p:leading-[2.2]
                                     prose-strong:text-white prose-strong:font-bold
-                                    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-10 prose-li:marker:text-neon-purple prose-li:mb-2
+                                    
+                                    /* --- ESPAÇAMENTO DOS PARÁGRAFOS (RESPIRO) --- */
+                                    prose-p:mb-10 md:prose-p:mb-12
+                                    
+                                    /* --- TÍTULOS (HEADINGS) - HIERARQUIA VISUAL --- */
+                                    prose-headings:text-white prose-headings:font-bold prose-headings:scroll-mt-32
+                                    
+                                    /* H2 - Principal (Maior destaque e separação) */
+                                    prose-h2:text-3xl md:prose-h2:text-4xl 
+                                    prose-h2:mt-20 md:prose-h2:mt-24 
+                                    prose-h2:mb-8 md:prose-h2:mb-10 
+                                    prose-h2:text-neon-cyan prose-h2:leading-tight
+
+                                    /* H3 - Subtítulo */
+                                    prose-h3:text-2xl md:prose-h3:text-3xl 
+                                    prose-h3:mt-16 md:prose-h3:mt-20 
+                                    prose-h3:mb-6 md:prose-h3:mb-8 
+                                    prose-h3:text-white prose-h3:leading-tight
+
+                                    /* H4 - Tópicos */
+                                    prose-h4:text-xl md:prose-h4:text-2xl 
+                                    prose-h4:mt-12 md:prose-h4:mt-16 
+                                    prose-h4:mb-4 md:prose-h4:mb-6 
+                                    prose-h4:text-neon-purple prose-h4:uppercase prose-h4:tracking-widest
+
+                                    /* H5 - Detalhes */
+                                    prose-h5:text-lg md:prose-h5:text-xl
+                                    prose-h5:mt-10 md:prose-h5:mt-12
+                                    prose-h5:mb-4
+                                    prose-h5:text-gray-200
+                                    
+                                    /* --- LINKS --- */
+                                    prose-a:text-neon-cyan prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-white transition-colors
+                                    
+                                    /* --- LISTAS --- */
+                                    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-10 prose-li:marker:text-neon-purple prose-li:mb-3 prose-li:pl-2
                                     prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-10 prose-li:marker:text-neon-cyan
+                                    
+                                    /* --- CITAÇÕES (BLOCKQUOTES) --- */
                                     prose-blockquote:border-l-4 prose-blockquote:border-neon-purple 
-                                    prose-blockquote:bg-white/[0.03] prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl 
+                                    prose-blockquote:bg-white/[0.03] prose-blockquote:py-8 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl 
                                     prose-blockquote:text-xl prose-blockquote:italic prose-blockquote:text-gray-200 prose-blockquote:not-italic prose-blockquote:font-light
-                                    prose-blockquote:my-12 prose-blockquote:shadow-lg
-                                    prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:my-12 prose-img:shadow-2xl prose-img:w-full
+                                    prose-blockquote:my-16 prose-blockquote:shadow-lg
+                                    
+                                    /* --- IMAGENS --- */
+                                    prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:my-16 prose-img:shadow-2xl prose-img:w-full
+                                    
+                                    /* --- CÓDIGOS E HR --- */
                                     prose-code:text-neon-cyan prose-code:bg-white/5 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:font-mono prose-code:text-sm prose-code:border prose-code:border-white/10
-                                    prose-hr:border-white/10 prose-hr:my-16
+                                    prose-hr:border-white/10 prose-hr:my-20
                                 ">
                                     <div dangerouslySetInnerHTML={{ __html: post.content || post.excerpt }} />
                                     
