@@ -19,26 +19,37 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 768) setItemsToShow(1);
-            else if (window.innerWidth < 1024) setItemsToShow(2);
-            else setItemsToShow(3);
+            let targetCols = 3;
+            if (window.innerWidth < 768) targetCols = 1;
+            else if (window.innerWidth < 1024) targetCols = 2;
+            
+            // Garante que não mostramos mais colunas do que projetos existentes
+            // Isso evita a duplicação visual de cards
+            setItemsToShow(Math.min(targetCols, projects.length));
         };
+        
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, [projects.length]); // Adicionado projects.length como dependência
 
     useEffect(() => {
-        if (isPaused) return;
+        // Só ativa o carrossel automático se houver mais projetos do que o visível
+        if (isPaused || projects.length <= itemsToShow) return;
 
         const interval = setInterval(() => {
             setActiveIndex((current) => (current + 1) % projects.length);
         }, SLIDE_INTERVAL);
 
         return () => clearInterval(interval);
-    }, [isPaused, projects.length]);
+    }, [isPaused, projects.length, itemsToShow]);
 
     const getVisibleProjects = () => {
+        // Se houver menos ou igual projetos do que o espaço, mostra tudo sem lógica de loop
+        if (projects.length <= itemsToShow) {
+            return projects;
+        }
+
         const visible = [];
         for (let i = 0; i < itemsToShow; i++) {
             const index = (activeIndex + i) % projects.length;
@@ -63,7 +74,11 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
         >
             <div className={`grid gap-6 px-4 md:px-0 transition-all duration-500`}
                 style={{ 
-                    gridTemplateColumns: `repeat(${itemsToShow}, minmax(0, 1fr))` 
+                    // Se tiver apenas 1 ou 2 itens, centraliza o grid se a tela for grande
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${itemsToShow}, minmax(0, 1fr))`,
+                    maxWidth: projects.length < 3 ? `${projects.length * 400}px` : '100%',
+                    margin: '0 auto'
                 }}
             >
                 {visibleProjects.map((project, idx) => (
@@ -87,10 +102,10 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
 
                         <div className="p-6 md:p-8 flex flex-col flex-grow relative">
                             <div className="flex justify-between items-start mb-3">
-                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-neon-cyan transition-colors">
+                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-neon-cyan transition-colors line-clamp-2">
                                     {project.title}
                                 </h3>
-                                <div className="p-2 bg-white/5 rounded-full text-white/50 group-hover:text-white group-hover:bg-neon-purple transition-all">
+                                <div className="p-2 bg-white/5 rounded-full text-white/50 group-hover:text-white group-hover:bg-neon-purple transition-all shrink-0 ml-2">
                                     <ArrowUpRight size={18} />
                                 </div>
                             </div>
@@ -111,16 +126,19 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
                 ))}
             </div>
 
-            <div className="flex justify-center gap-2 mt-10">
-                {projects.map((_, idx) => (
-                    <button 
-                        key={idx}
-                        onClick={() => setActiveIndex(idx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-10 bg-neon-cyan' : 'w-2 bg-white/20'}`}
-                        aria-label={`Ir para slide ${idx + 1}`}
-                    />
-                ))}
-            </div>
+            {/* Barras de Progresso / Indicadores - Só mostra se tiver scroll */}
+            {projects.length > itemsToShow && (
+                <div className="flex justify-center gap-2 mt-10">
+                    {projects.map((_, idx) => (
+                        <button 
+                            key={idx}
+                            onClick={() => setActiveIndex(idx)}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-10 bg-neon-cyan' : 'w-2 bg-white/20'}`}
+                            aria-label={`Ir para slide ${idx + 1}`}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

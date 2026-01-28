@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchProjectById } from '../services/supabaseService';
@@ -60,6 +61,22 @@ const ProjectDetails: React.FC = () => {
         };
     }, [lightboxIndex, closeLightbox, nextImage, prevImage]);
 
+    // Função para formatar texto puro em parágrafos HTML se necessário
+    const formatContent = (content?: string) => {
+        if (!content) return '';
+        
+        // Se já parece HTML (tem tags), retorna como está
+        if (/<[a-z][\s\S]*>/i.test(content)) {
+            return content;
+        }
+
+        // Se for texto puro, quebra nas novas linhas duplas e cria parágrafos
+        return content
+            .split(/\n\s*\n/) // Divide por quebras de linha duplas
+            .filter(Boolean)
+            .map(p => `<p>${p.trim().replace(/\n/g, '<br/>')}</p>`) // Mantém quebras simples como <br>
+            .join('');
+    };
 
     if (loading) return (
         <div className="min-h-screen bg-bg-dark flex flex-col items-center justify-center text-white gap-4">
@@ -90,7 +107,7 @@ const ProjectDetails: React.FC = () => {
                             <div>
                                 <div className="flex items-center gap-3 mb-4">
                                     <span className="px-3 py-1 rounded border border-neon-cyan/30 text-neon-cyan text-[10px] font-bold uppercase tracking-[0.2em] bg-neon-cyan/5">
-                                        {project.category}
+                                        {project.category || 'Projeto'}
                                     </span>
                                     {project.year && <span className="text-gray-500 text-xs font-mono">//{project.year}</span>}
                                 </div>
@@ -105,7 +122,7 @@ const ProjectDetails: React.FC = () => {
                                 </div>
                                 <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
                                     <div className="flex items-center gap-2 text-gray-500 text-xs uppercase font-bold mb-1"><Layers size={14} /> Serviço</div>
-                                    <div className="text-white font-medium truncate">{project.category}</div>
+                                    <div className="text-white font-medium">{project.category || 'Desenvolvimento'}</div>
                                 </div>
                             </div>
 
@@ -141,8 +158,26 @@ const ProjectDetails: React.FC = () => {
                     <div className="lg:col-span-8 space-y-12 md:space-y-16">
                         <ScrollAnimation>
                             <div className="prose prose-invert prose-lg max-w-none">
-                                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3"><span className="w-8 h-1 bg-neon-purple rounded-full"></span> Visão Geral</h3>
-                                <p className="text-gray-300 leading-8 text-base md:text-lg font-light">{project.fullDescription || project.description}</p>
+                                <h3 className="text-xl md:text-2xl font-bold text-white mb-8 flex items-center gap-3"><span className="w-8 h-1 bg-neon-purple rounded-full"></span> Visão Geral</h3>
+                                
+                                {/* 
+                                    AQUI ESTÁ A CORREÇÃO PRINCIPAL:
+                                    1. Usamos formatContent para converter texto puro em HTML com parágrafos.
+                                    2. Aumentamos o espaçamento (mb-10) e a altura da linha (leading-loose).
+                                */}
+                                <div 
+                                    className="
+                                        text-gray-300 font-light text-base md:text-lg leading-loose
+                                        prose-p:mb-10 md:prose-p:mb-12
+                                        prose-headings:text-white prose-headings:font-bold prose-headings:mb-6 prose-headings:mt-12
+                                        prose-strong:text-white prose-strong:font-semibold
+                                        prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-10 prose-li:mb-2
+                                        prose-a:text-neon-cyan prose-a:no-underline hover:prose-a:underline
+                                    "
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: formatContent(project.fullDescription || project.description) 
+                                    }} 
+                                />
                             </div>
                         </ScrollAnimation>
                         
@@ -151,7 +186,10 @@ const ProjectDetails: React.FC = () => {
                                 <ScrollAnimation delay={0.1}>
                                     <div className="bg-white/[0.02] border border-white/5 p-6 md:p-8 rounded-2xl h-full hover:border-red-500/30 transition-colors">
                                         <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500"></span> O Desafio</h3>
-                                        <p className="text-gray-400 leading-relaxed text-sm">{project.challenge}</p>
+                                        <div 
+                                            className="text-gray-400 leading-relaxed text-sm whitespace-pre-wrap"
+                                            dangerouslySetInnerHTML={{ __html: formatContent(project.challenge) }}
+                                        />
                                     </div>
                                 </ScrollAnimation>
                             )}
@@ -159,7 +197,10 @@ const ProjectDetails: React.FC = () => {
                                 <ScrollAnimation delay={0.2}>
                                     <div className="bg-white/[0.02] border border-white/5 p-6 md:p-8 rounded-2xl h-full hover:border-green-500/30 transition-colors">
                                         <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span> A Solução</h3>
-                                        <p className="text-gray-400 leading-relaxed text-sm">{project.solution}</p>
+                                        <div 
+                                            className="text-gray-400 leading-relaxed text-sm whitespace-pre-wrap"
+                                            dangerouslySetInnerHTML={{ __html: formatContent(project.solution) }}
+                                        />
                                     </div>
                                 </ScrollAnimation>
                             )}
