@@ -6,6 +6,7 @@
 export interface Project {
     id: number; // No SQL é bigint (number no JS)
     title: string;
+    slug?: string; // URL Amigável
     description: string; // Descrição curta
     fullDescription?: string; // HTML do editor (mapeado de full_description)
     challenge?: string;
@@ -31,21 +32,19 @@ export interface BlogPost {
     author?: string;
     readTime?: string; // Mapeado de 'read_time'
     status?: string;
-    // Novos campos adicionados baseados no SQL
-    tags?: string[];
+    tags?: string[]; // Mapeado de 'tags' do banco
     meta_title?: string;
-    meta_description?: string;
 }
 
 export interface MicroSaas {
     id: number;
     name: string;
     description: string;
-    image?: string;
     status: 'Venda' | 'Uso' | 'Beta';
     price?: string;
     link: string;
     features: string[];
+    image?: string;
 }
 
 export interface Service {
@@ -63,5 +62,5 @@ export interface SiteSettings {
     telegram?: string;
     footer_text?: string;
     author_name?: string;
-    contact_email?: string; // Caso adicione no futuro, ou use o hardcoded
+    contact_email?: string;
 }

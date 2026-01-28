@@ -1,14 +1,15 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchProjectById } from '../services/supabaseService';
+import { fetchProjectBySlug, fetchProjectById } from '../services/supabaseService';
 import { Project } from '../types';
 import ScrollAnimation from '../components/ScrollAnimation';
 import MultiStepForm from '../components/MultiStepForm';
 import { ArrowLeft, ArrowUpRight, User, Code2, Layers, CheckCircle2, X, ChevronLeft, ChevronRight, Maximize2, Rocket, CheckCircle, ArrowRight } from 'lucide-react';
 
 const ProjectDetails: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    // A rota agora passa :slug, que pode ser o slug amigável ou o ID numérico (legado)
+    const { slug } = useParams<{ slug: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -18,15 +19,23 @@ const ProjectDetails: React.FC = () => {
 
     useEffect(() => {
         const load = async () => {
-            if (id) {
-                const data = await fetchProjectById(id);
+            if (slug) {
+                // 1. Tenta buscar pelo campo 'slug'
+                let data = await fetchProjectBySlug(slug);
+                
+                // 2. Fallback: Se não encontrou e o slug parece um número, tenta buscar por ID
+                // Isso garante compatibilidade se alguém acessar um link antigo
+                if (!data && /^\d+$/.test(slug)) {
+                    data = await fetchProjectById(slug);
+                }
+                
                 setProject(data || null);
             }
             setLoading(false);
         };
         load();
         window.scrollTo(0, 0);
-    }, [id]);
+    }, [slug]);
 
     // Trava o scroll quando modal ou lightbox estão abertos
     useEffect(() => {
@@ -160,11 +169,6 @@ const ProjectDetails: React.FC = () => {
                             <div className="prose prose-invert prose-lg max-w-none">
                                 <h3 className="text-xl md:text-2xl font-bold text-white mb-8 flex items-center gap-3"><span className="w-8 h-1 bg-neon-purple rounded-full"></span> Visão Geral</h3>
                                 
-                                {/* 
-                                    AQUI ESTÁ A CORREÇÃO PRINCIPAL:
-                                    1. Usamos formatContent para converter texto puro em HTML com parágrafos.
-                                    2. Aumentamos o espaçamento (mb-10) e a altura da linha (leading-loose).
-                                */}
                                 <div 
                                     className="
                                         text-gray-300 font-light text-base md:text-lg leading-loose

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Project } from '../types';
 import { ArrowUpRight } from 'lucide-react';
@@ -24,17 +25,15 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
             else if (window.innerWidth < 1024) targetCols = 2;
             
             // Garante que não mostramos mais colunas do que projetos existentes
-            // Isso evita a duplicação visual de cards
             setItemsToShow(Math.min(targetCols, projects.length));
         };
         
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [projects.length]); // Adicionado projects.length como dependência
+    }, [projects.length]);
 
     useEffect(() => {
-        // Só ativa o carrossel automático se houver mais projetos do que o visível
         if (isPaused || projects.length <= itemsToShow) return;
 
         const interval = setInterval(() => {
@@ -45,7 +44,6 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
     }, [isPaused, projects.length, itemsToShow]);
 
     const getVisibleProjects = () => {
-        // Se houver menos ou igual projetos do que o espaço, mostra tudo sem lógica de loop
         if (projects.length <= itemsToShow) {
             return projects;
         }
@@ -60,8 +58,10 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
 
     const visibleProjects = getVisibleProjects();
 
-    const handleProjectClick = (id: number) => {
-        navigate(`/project/${id}`);
+    const handleProjectClick = (project: Project) => {
+        // Usa o slug se existir, senão usa o ID (para compatibilidade ou fallback)
+        const identifier = project.slug || project.id;
+        navigate(`/project/${identifier}`);
     };
 
     return (
@@ -74,7 +74,6 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
         >
             <div className={`grid gap-6 px-4 md:px-0 transition-all duration-500`}
                 style={{ 
-                    // Se tiver apenas 1 ou 2 itens, centraliza o grid se a tela for grande
                     display: 'grid',
                     gridTemplateColumns: `repeat(${itemsToShow}, minmax(0, 1fr))`,
                     maxWidth: projects.length < 3 ? `${projects.length * 400}px` : '100%',
@@ -84,7 +83,7 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
                 {visibleProjects.map((project, idx) => (
                     <div 
                         key={`${project.id}-${activeIndex}-${idx}`} 
-                        onClick={() => handleProjectClick(project.id)}
+                        onClick={() => handleProjectClick(project)}
                         className="group relative bg-white/[0.02] backdrop-blur-sm border border-white/5 rounded-3xl overflow-hidden hover:border-white/20 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,226,255,0.1)] h-[450px] flex flex-col cursor-pointer animate-fade-in"
                     >
                         <div className="h-[240px] w-full overflow-hidden relative">
@@ -126,7 +125,6 @@ const PortfolioCarousel: React.FC<Props> = ({ projects }) => {
                 ))}
             </div>
 
-            {/* Barras de Progresso / Indicadores - Só mostra se tiver scroll */}
             {projects.length > itemsToShow && (
                 <div className="flex justify-center gap-2 mt-10">
                     {projects.map((_, idx) => (

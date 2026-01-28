@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
@@ -78,7 +79,10 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/portfolio" element={<PortfolioAll />} />
-            <Route path="/project/:id" element={<ProjectDetails />} />
+            
+            {/* Rota atualizada para usar slug */}
+            <Route path="/project/:slug" element={<ProjectDetails />} />
+            
             <Route path="/blog" element={<BlogAll />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/microsaas" element={<Microsaas />} />

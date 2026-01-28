@@ -33,29 +33,16 @@ const supabaseKey = getEnv('VITE_SUPABASE_ANON_KEY', FALLBACK_KEY);
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ==============================================================================
-// 2. AUTENTICAÇÃO
+// 1.1 AUTENTICAÇÃO
 // ==============================================================================
-
-export const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
-    return { data, error };
-};
 
 export const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     return { error };
 };
 
-export const getCurrentUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.user || null;
-};
-
 // ==============================================================================
-// 3. SETTINGS (NOVO)
+// 2. SETTINGS
 // ==============================================================================
 
 let settingsCache: SiteSettings | null = null;
@@ -71,8 +58,7 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
             .single();
 
         if (error) {
-            // Se der erro (tabela vazia), retorna null mas não quebra
-            console.warn('Configurações não encontradas ou erro:', error.message);
+            // console.warn('Configurações não encontradas ou erro:', error.message);
             return null;
         }
 
@@ -85,7 +71,7 @@ export const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
 };
 
 // ==============================================================================
-// 4. FUNÇÕES DO PORTFÓLIO
+// 3. FUNÇÕES DO PORTFÓLIO
 // ==============================================================================
 
 export const fetchProjects = async (): Promise<Project[]> => {
@@ -103,6 +89,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
         return data.map((item: any) => ({
             id: item.id,
             title: item.title,
+            slug: item.slug, // Mapeando o Slug
             category: item.category,
             description: item.description, 
             fullDescription: item.full_description,
@@ -122,6 +109,40 @@ export const fetchProjects = async (): Promise<Project[]> => {
     }
 };
 
+// Função para buscar projeto pelo SLUG
+export const fetchProjectBySlug = async (slug: string): Promise<Project | undefined> => {
+    try {
+        const { data, error } = await supabase
+            .from('portfolio')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+        if (error || !data) return undefined;
+
+        return {
+            id: data.id,
+            title: data.title,
+            slug: data.slug,
+            category: data.category,
+            description: data.description,
+            fullDescription: data.full_description,
+            challenge: data.challenge,
+            solution: data.solution,
+            image_url: data.image,
+            gallery: data.gallery || [],
+            technologies: data.technologies || [],
+            client: data.client,
+            year: data.year,
+            link: data.link
+        };
+    } catch (err) {
+        console.error('Erro em fetchProjectBySlug:', err);
+        return undefined;
+    }
+};
+
+// Mantido para compatibilidade, caso algum link ainda use ID
 export const fetchProjectById = async (id: string): Promise<Project | undefined> => {
     try {
         const { data, error } = await supabase
@@ -135,6 +156,7 @@ export const fetchProjectById = async (id: string): Promise<Project | undefined>
         return {
             id: data.id,
             title: data.title,
+            slug: data.slug,
             category: data.category,
             description: data.description,
             fullDescription: data.full_description,
@@ -154,7 +176,7 @@ export const fetchProjectById = async (id: string): Promise<Project | undefined>
 };
 
 // ==============================================================================
-// 5. FUNÇÕES DO BLOG
+// 4. FUNÇÕES DO BLOG
 // ==============================================================================
 
 export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
@@ -180,11 +202,8 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
             content: post.content,
             author: post.author,
             readTime: post.read_time, 
-            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
-            // Novos campos
             tags: post.tags || [],
-            meta_title: post.meta_title,
-            meta_description: post.meta_description
+            date: new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
         }));
     } catch (err) {
         console.error(err);
@@ -212,10 +231,9 @@ export const fetchPostBySlug = async (slug: string): Promise<BlogPost | undefine
             content: data.content,
             author: data.author,
             readTime: data.read_time,
-            date: new Date(data.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
             tags: data.tags || [],
-            meta_title: data.meta_title,
-            meta_description: data.meta_description
+            date: new Date(data.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
+            meta_title: data.meta_title
         };
     } catch (err) {
         console.error(err);
@@ -253,7 +271,7 @@ export const fetchRelatedPosts = async (currentSlug: string, category: string): 
 };
 
 // ==============================================================================
-// 6. FUNÇÕES DE MICROSAAS
+// 5. FUNÇÕES DE MICROSAAS
 // ==============================================================================
 
 export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
@@ -272,11 +290,11 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
             id: item.id,
             name: item.name,
             description: item.description,
-            image: item.image,
             status: item.status,
             price: item.price,
             link: item.link,
-            features: item.features || [] 
+            features: item.features || [],
+            image: item.image
         }));
     } catch (err) {
         console.error(err);
@@ -285,7 +303,7 @@ export const fetchMicrosaas = async (): Promise<MicroSaas[]> => {
 };
 
 // ==============================================================================
-// 7. FUNÇÕES DE LEADS
+// 6. FUNÇÕES DE LEADS
 // ==============================================================================
 
 export const createLead = async (leadData: { 
