@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
 import { fetchSiteSettings } from '../services/supabaseService';
 import logo from '../logo.svg'; 
+import { FaWhatsapp } from 'react-icons/fa6';
 
 const FOOTER_NAV_LINKS = [
     { name: 'Quem Somos', href: 'about', type: 'anchor' },
@@ -173,7 +174,7 @@ const Footer: React.FC = () => {
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5 mt-1">
                                     <MapPin className="w-5 h-5 text-neon-purple" />
                                 </div>
-                                <span className="leading-relaxed">Av. Paulista, 1000 - SP<br/>Brasil</span>
+                                <span className="leading-relaxed">Ourinhos - SP<br/>Brasil</span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
@@ -183,7 +184,7 @@ const Footer: React.FC = () => {
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-lg shrink-0 border border-white/5">
-                                    <Smartphone className="w-5 h-5 text-neon-purple" />
+                                    <FaWhatsapp className="w-5 h-5 text-neon-purple" />
                                 </div>
                                 <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                                     {settings.whatsappDisplay}
