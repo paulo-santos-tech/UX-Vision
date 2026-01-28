@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Rocket, Instagram, Linkedin, Mail, MapPin, Smartphone, CheckCircle, Loader2, Facebook, Send } from 'lucide-react';
+import { Rocket, Instagram, Linkedin, Mail, MapPin, CheckCircle, Loader2, Facebook, Send } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/emailService';
 import { fetchSiteSettings } from '../services/supabaseService';
