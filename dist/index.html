@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-br" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/assets/logo-yscrNS9l.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UX Vision | Digital Experiences</title>
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Configuração do Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Vision | Digital Experiences</title>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Google Analytics (Substitua G-SEU_ID_AQUI pelo seu ID real) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BCH2D01G5G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-BCH2D01G5G');
+  </script>
 
   <script type="importmap">
 {
@@ -22,15 +37,17 @@
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "framer-motion": "https://esm.sh/framer-motion@^12.27.0",
     "@tailwindcss/typography": "https://esm.sh/@tailwindcss/typography@^0.5.19",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1"
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1",
+    "react-icons/": "https://esm.sh/react-icons@^5.5.0/",
+    "@emailjs/browser": "https://esm.sh/@emailjs/browser@^4.4.1"
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-B3xb6bVN.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/vendor-R6dHZySI.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-bqpLeNF5.css">
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
